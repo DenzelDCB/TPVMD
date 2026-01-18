@@ -1,0 +1,1723 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vendor Management Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="/_sdk/data_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    body { box-sizing: border-box; }
+    * { font-family: 'DM Sans', sans-serif; }
+    
+    :root {
+      --bg-primary: #f8fafc;
+      --bg-secondary: #ffffff;
+      --text-primary: #1e293b;
+      --accent-primary: #6366f1;
+      --accent-secondary: #10b981;
+    }
+    
+    .dark {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --text-primary: #f1f5f9;
+      --accent-primary: #818cf8;
+      --accent-secondary: #34d399;
+    }
+    
+    .theme-bg-primary { background-color: var(--bg-primary); }
+    .theme-bg-secondary { background-color: var(--bg-secondary); }
+    .theme-text-primary { color: var(--text-primary); }
+    .theme-accent-primary { color: var(--accent-primary); }
+    .theme-accent-secondary { color: var(--accent-secondary); }
+    .theme-border { border-color: var(--bg-secondary); }
+    
+    .dark .theme-border { border-color: #334155; }
+    
+    .sidebar-item:hover { background-color: var(--accent-primary); color: white; }
+    .sidebar-item.active { background-color: var(--accent-primary); color: white; }
+    
+    .card { 
+      background-color: var(--bg-secondary); 
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15); }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-primary) 0%, #4f46e5 100%);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .btn-primary:hover { transform: scale(1.02); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    
+    .btn-secondary {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: 500;
+      border: 1px solid #e2e8f0;
+      transition: all 0.2s;
+    }
+    .dark .btn-secondary { border-color: #475569; }
+    .btn-secondary:hover { background-color: var(--accent-primary); color: white; }
+    
+    .input-field {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      border: 2px solid transparent;
+      border-radius: 10px;
+      padding: 12px 16px;
+      width: 100%;
+      transition: border-color 0.2s;
+    }
+    .input-field:focus { outline: none; border-color: var(--accent-primary); }
+    
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .status-active { background-color: #dcfce7; color: #166534; }
+    .status-pending { background-color: #fef3c7; color: #92400e; }
+    .status-inactive { background-color: #fee2e2; color: #991b1b; }
+    .status-review { background-color: #dbeafe; color: #1e40af; }
+    
+    .risk-high { background-color: #fee2e2; color: #dc2626; }
+    .risk-medium { background-color: #fef3c7; color: #d97706; }
+    .risk-low { background-color: #dcfce7; color: #16a34a; }
+    
+    .progress-bar {
+      height: 8px;
+      border-radius: 4px;
+      background-color: var(--bg-primary);
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+    
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+    }
+    .modal-overlay.active { opacity: 1; visibility: visible; }
+    
+    .modal-content {
+      background-color: var(--bg-secondary);
+      border-radius: 20px;
+      padding: 32px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 90%;
+      overflow-y: auto;
+      transform: scale(0.9);
+      transition: transform 0.3s;
+    }
+    .modal-overlay.active .modal-content { transform: scale(1); }
+    
+    .chart-bar {
+      background: linear-gradient(180deg, var(--accent-primary) 0%, #4f46e5 100%);
+      border-radius: 6px 6px 0 0;
+      transition: height 0.5s ease;
+    }
+    
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 16px 24px;
+      border-radius: 12px;
+      color: white;
+      font-weight: 500;
+      z-index: 2000;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+    .toast.error { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+    
+    .loading-spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid transparent;
+      border-top-color: currentColor;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    .fade-in { animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    .table-row { transition: background-color 0.2s; }
+    .table-row:hover { background-color: var(--bg-primary); }
+    
+    @media (max-width: 1024px) {
+      .sidebar { transform: translateX(-100%); position: fixed; z-index: 500; }
+      .sidebar.open { transform: translateX(0); }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ </head>
+ <body class="h-full theme-bg-primary theme-text-primary">
+  <div id="app" class="h-full flex overflow-auto"><!-- Sidebar -->
+   <aside id="sidebar" class="sidebar w-64 theme-bg-secondary h-full flex flex-col p-4 shrink-0">
+    <div class="flex items-center gap-3 mb-8 px-2">
+     <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+      </svg>
+     </div>
+     <div>
+      <h1 id="sidebar-title" class="font-bold text-lg">VendorHub</h1>
+      <p id="company-name" class="text-xs opacity-60">Your Company</p>
+     </div>
+    </div>
+    <nav class="flex-1 space-y-1"><button class="sidebar-item active w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all" data-view="dashboard">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+      </svg><span>Dashboard</span> </button> <button class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all" data-view="vendors">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+      </svg><span>Vendors</span> </button> <button class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all" data-view="contracts">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg><span>Contracts</span> </button> <button class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all" data-view="compliance">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+      </svg><span>Compliance</span> </button> <button class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all" data-view="analytics">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      </svg><span>Analytics</span> </button> <button class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all" data-view="risk">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      </svg><span>Risk Assessment</span> </button> <button class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all" data-view="performance">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+      </svg><span>Performance</span> </button> <button class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all" data-view="documents">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+      </svg><span>Documents</span> </button> <button class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all" data-view="invoices">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
+      </svg><span>Invoices</span> </button> <button class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all" data-view="audits">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+      </svg><span>Audit Trail</span> </button> <button class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all" data-view="reports">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg><span>Reports</span> </button>
+    </nav>
+    <div class="mt-auto pt-4 border-t theme-border"><button id="theme-toggle" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-indigo-500 hover:text-white transition-all">
+      <svg id="theme-icon-light" class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+      </svg>
+      <svg id="theme-icon-dark" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+      </svg><span id="theme-text">Dark Mode</span> </button>
+    </div>
+   </aside><!-- Main Content -->
+   <main class="flex-1 p-6 overflow-auto"><!-- Header -->
+    <header class="flex items-center justify-between mb-8">
+     <div class="flex items-center gap-4"><button id="mobile-menu" class="lg:hidden p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700">
+       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+       </svg></button>
+      <div>
+       <h2 id="page-title" class="text-2xl font-bold">Dashboard</h2>
+       <p class="text-sm opacity-60">Overview of your vendor ecosystem</p>
+      </div>
+     </div>
+     <div class="flex items-center gap-3">
+      <div class="relative"><input type="text" id="search-input" placeholder="Search vendors..." class="input-field pl-10 w-64">
+       <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 opacity-40" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+       </svg>
+      </div><button id="add-vendor-btn" class="btn-primary flex items-center gap-2">
+       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+       </svg><span>Add Vendor</span> </button>
+     </div>
+    </header><!-- Dashboard View -->
+    <div id="dashboard-view" class="view-content"><!-- Stats Cards -->
+     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div class="card p-6">
+       <div class="flex items-center justify-between mb-4">
+        <div class="w-12 h-12 rounded-xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
+         <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+         </svg>
+        </div><span class="status-badge status-active" id="stat-trend-vendors">+12%</span>
+       </div>
+       <h3 class="text-3xl font-bold" id="stat-total-vendors">0</h3>
+       <p class="text-sm opacity-60">Total Vendors</p>
+      </div>
+      <div class="card p-6">
+       <div class="flex items-center justify-between mb-4">
+        <div class="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+         <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+         </svg>
+        </div><span class="status-badge status-active" id="stat-trend-active">Active</span>
+       </div>
+       <h3 class="text-3xl font-bold" id="stat-active-vendors">0</h3>
+       <p class="text-sm opacity-60">Active Contracts</p>
+      </div>
+      <div class="card p-6">
+       <div class="flex items-center justify-between mb-4">
+        <div class="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+         <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+         </svg>
+        </div><span class="status-badge status-pending" id="stat-trend-review">Review</span>
+       </div>
+       <h3 class="text-3xl font-bold" id="stat-pending-review">0</h3>
+       <p class="text-sm opacity-60">Pending Review</p>
+      </div>
+      <div class="card p-6">
+       <div class="flex items-center justify-between mb-4">
+        <div class="w-12 h-12 rounded-xl bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center">
+         <svg class="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+         </svg>
+        </div><span class="status-badge risk-high" id="stat-trend-risk">Alert</span>
+       </div>
+       <h3 class="text-3xl font-bold" id="stat-high-risk">0</h3>
+       <p class="text-sm opacity-60">High Risk Vendors</p>
+      </div>
+     </div><!-- Charts Row -->
+     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8"><!-- Contract Value Chart -->
+      <div class="card p-6">
+       <h3 class="font-semibold mb-6">Contract Value by Category</h3>
+       <div id="category-chart" class="flex items-end justify-around h-48 gap-2"><!-- Chart bars will be rendered here -->
+       </div>
+       <div class="flex justify-around mt-4 text-xs opacity-60"><span>Technology</span> <span>Marketing</span> <span>Operations</span> <span>Finance</span> <span>HR</span>
+       </div>
+      </div><!-- Compliance Overview -->
+      <div class="card p-6">
+       <h3 class="font-semibold mb-6">Compliance Overview</h3>
+       <div class="space-y-4">
+        <div>
+         <div class="flex justify-between mb-2 text-sm"><span>Overall Compliance</span> <span id="compliance-overall">0%</span>
+         </div>
+         <div class="progress-bar">
+          <div id="compliance-bar-overall" class="progress-fill bg-gradient-to-r from-indigo-500 to-purple-500" style="width: 0%"></div>
+         </div>
+        </div>
+        <div>
+         <div class="flex justify-between mb-2 text-sm"><span>Documentation Complete</span> <span id="compliance-docs">0%</span>
+         </div>
+         <div class="progress-bar">
+          <div id="compliance-bar-docs" class="progress-fill bg-gradient-to-r from-emerald-500 to-teal-500" style="width: 0%"></div>
+         </div>
+        </div>
+        <div>
+         <div class="flex justify-between mb-2 text-sm"><span>Risk Assessment Done</span> <span id="compliance-risk">0%</span>
+         </div>
+         <div class="progress-bar">
+          <div id="compliance-bar-risk" class="progress-fill bg-gradient-to-r from-amber-500 to-orange-500" style="width: 0%"></div>
+         </div>
+        </div>
+        <div>
+         <div class="flex justify-between mb-2 text-sm"><span>Contract Renewal Status</span> <span id="compliance-renewal">0%</span>
+         </div>
+         <div class="progress-bar">
+          <div id="compliance-bar-renewal" class="progress-fill bg-gradient-to-r from-rose-500 to-pink-500" style="width: 0%"></div>
+         </div>
+        </div>
+       </div>
+      </div>
+     </div><!-- Recent Vendors -->
+     <div class="card p-6">
+      <div class="flex items-center justify-between mb-6">
+       <h3 class="font-semibold">Recent Vendors</h3><button class="text-sm theme-accent-primary font-medium" onclick="switchView('vendors')">View All →</button>
+      </div>
+      <div id="recent-vendors-list" class="space-y-3">
+       <p class="text-center py-8 opacity-60">No vendors yet. Add your first vendor to get started!</p>
+      </div>
+     </div>
+    </div><!-- Vendors View -->
+    <div id="vendors-view" class="view-content hidden">
+     <div class="card overflow-hidden">
+      <div class="p-4 border-b theme-border flex items-center justify-between">
+       <div class="flex items-center gap-4"><select id="filter-status" class="input-field py-2 w-40"> <option value="">All Status</option> <option value="active">Active</option> <option value="pending">Pending</option> <option value="inactive">Inactive</option> <option value="review">Under Review</option> </select> <select id="filter-risk" class="input-field py-2 w-40"> <option value="">All Risk Levels</option> <option value="low">Low Risk</option> <option value="medium">Medium Risk</option> <option value="high">High Risk</option> </select> <select id="filter-category" class="input-field py-2 w-40"> <option value="">All Categories</option> <option value="technology">Technology</option> <option value="marketing">Marketing</option> <option value="operations">Operations</option> <option value="finance">Finance</option> <option value="hr">Human Resources</option> </select>
+       </div><button id="export-btn" class="btn-secondary flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+        </svg> Export </button>
+      </div>
+      <div class="overflow-x-auto">
+       <table class="w-full">
+        <thead class="text-left text-sm opacity-60 border-b theme-border">
+         <tr>
+          <th class="p-4 font-medium">Vendor Name</th>
+          <th class="p-4 font-medium">Category</th>
+          <th class="p-4 font-medium">Status</th>
+          <th class="p-4 font-medium">Risk Level</th>
+          <th class="p-4 font-medium">Contract Value</th>
+          <th class="p-4 font-medium">Compliance</th>
+          <th class="p-4 font-medium">Actions</th>
+         </tr>
+        </thead>
+        <tbody id="vendors-table-body">
+         <tr>
+          <td colspan="7" class="p-8 text-center opacity-60">No vendors found</td>
+         </tr>
+        </tbody>
+       </table>
+      </div>
+     </div>
+    </div><!-- Contracts View -->
+    <div id="contracts-view" class="view-content hidden">
+     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <div class="card p-6">
+       <h4 class="text-sm opacity-60 mb-2">Total Contract Value</h4>
+       <p class="text-2xl font-bold" id="total-contract-value">$0</p>
+      </div>
+      <div class="card p-6">
+       <h4 class="text-sm opacity-60 mb-2">Expiring This Month</h4>
+       <p class="text-2xl font-bold text-amber-500" id="expiring-contracts">0</p>
+      </div>
+      <div class="card p-6">
+       <h4 class="text-sm opacity-60 mb-2">Avg. Contract Duration</h4>
+       <p class="text-2xl font-bold" id="avg-contract-duration">0 months</p>
+      </div>
+     </div>
+     <div class="card p-6">
+      <h3 class="font-semibold mb-6">Contract Timeline</h3>
+      <div id="contracts-timeline" class="space-y-4">
+       <p class="text-center py-8 opacity-60">No contracts to display</p>
+      </div>
+     </div>
+    </div><!-- Compliance View -->
+    <div id="compliance-view" class="view-content hidden">
+     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+      <div class="card p-6 text-center">
+       <div class="w-24 h-24 mx-auto rounded-full border-8 border-emerald-500 flex items-center justify-center mb-4"><span class="text-2xl font-bold" id="compliance-score-display">0%</span>
+       </div>
+       <h4 class="font-semibold">Overall Score</h4>
+       <p class="text-sm opacity-60">Across all vendors</p>
+      </div>
+      <div class="card p-6">
+       <h4 class="font-semibold mb-4">Compliance by Category</h4>
+       <div id="compliance-by-category" class="space-y-3">
+        <p class="text-sm opacity-60">No data available</p>
+       </div>
+      </div>
+      <div class="card p-6">
+       <h4 class="font-semibold mb-4">Action Items</h4>
+       <div id="compliance-actions" class="space-y-2">
+        <p class="text-sm opacity-60">No action items</p>
+       </div>
+      </div>
+     </div>
+     <div class="card p-6">
+      <h3 class="font-semibold mb-6">Vendor Compliance Details</h3>
+      <div id="compliance-details-list" class="space-y-3">
+       <p class="text-center py-8 opacity-60">No vendors to review</p>
+      </div>
+     </div>
+    </div><!-- Analytics View -->
+    <div id="analytics-view" class="view-content hidden">
+     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <div class="card p-6">
+       <h3 class="font-semibold mb-6">Spend Analysis</h3>
+       <div id="spend-chart" class="h-64 flex items-end justify-around gap-4"><!-- Spend bars will be rendered here -->
+       </div>
+       <div class="flex justify-around mt-4 text-xs opacity-60"><span>Q1</span> <span>Q2</span> <span>Q3</span> <span>Q4</span>
+       </div>
+      </div>
+      <div class="card p-6">
+       <h3 class="font-semibold mb-6">Risk Distribution</h3>
+       <div id="risk-distribution" class="flex items-center justify-center gap-8">
+        <div class="text-center">
+         <div class="w-20 h-20 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mb-2"><span class="text-2xl font-bold text-emerald-600" id="risk-low-count">0</span>
+         </div><span class="text-sm">Low Risk</span>
+        </div>
+        <div class="text-center">
+         <div class="w-20 h-20 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mb-2"><span class="text-2xl font-bold text-amber-600" id="risk-medium-count">0</span>
+         </div><span class="text-sm">Medium Risk</span>
+        </div>
+        <div class="text-center">
+         <div class="w-20 h-20 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center mb-2"><span class="text-2xl font-bold text-rose-600" id="risk-high-count">0</span>
+         </div><span class="text-sm">High Risk</span>
+        </div>
+       </div>
+      </div>
+     </div>
+     <div class="card p-6">
+      <h3 class="font-semibold mb-6">Category Breakdown</h3>
+      <div id="category-breakdown" class="grid grid-cols-2 md:grid-cols-5 gap-4"><!-- Category cards will be rendered here -->
+      </div>
+     </div>
+    </div><!-- Risk Assessment View -->
+    <div id="risk-view" class="view-content hidden">
+     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <div class="card p-6 text-center">
+       <h4 class="text-sm opacity-60 mb-2">Critical Risks</h4>
+       <p class="text-3xl font-bold text-rose-600" id="critical-risks">0</p>
+      </div>
+      <div class="card p-6 text-center">
+       <h4 class="text-sm opacity-60 mb-2">Medium Risks</h4>
+       <p class="text-3xl font-bold text-amber-600" id="medium-risks">0</p>
+      </div>
+      <div class="card p-6 text-center">
+       <h4 class="text-sm opacity-60 mb-2">Low Risks</h4>
+       <p class="text-3xl font-bold text-emerald-600" id="low-risks">0</p>
+      </div>
+     </div>
+     <div class="card p-6">
+      <h3 class="font-semibold mb-6">Risk Matrix</h3>
+      <div id="risk-matrix" class="space-y-3">
+       <p class="text-center py-8 opacity-60">No risk assessments available</p>
+      </div>
+     </div>
+    </div><!-- Performance View -->
+    <div id="performance-view" class="view-content hidden">
+     <div class="card p-6 mb-6">
+      <h3 class="font-semibold mb-6">Vendor Performance Scorecard</h3>
+      <div id="performance-scorecard" class="space-y-4">
+       <p class="text-center py-8 opacity-60">No performance data available</p>
+      </div>
+     </div>
+    </div><!-- Documents View -->
+    <div id="documents-view" class="view-content hidden">
+     <div class="card p-6">
+      <h3 class="font-semibold mb-6">Document Repository</h3>
+      <div id="documents-list" class="space-y-3">
+       <p class="text-center py-8 opacity-60">No documents uploaded yet</p>
+      </div>
+     </div>
+    </div><!-- Invoices View -->
+    <div id="invoices-view" class="view-content hidden">
+     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+      <div class="card p-6">
+       <h4 class="text-sm opacity-60 mb-2">Total Invoiced</h4>
+       <p class="text-2xl font-bold" id="total-invoiced">$0</p>
+      </div>
+      <div class="card p-6">
+       <h4 class="text-sm opacity-60 mb-2">Paid</h4>
+       <p class="text-2xl font-bold text-emerald-600" id="paid-invoices">$0</p>
+      </div>
+      <div class="card p-6">
+       <h4 class="text-sm opacity-60 mb-2">Pending</h4>
+       <p class="text-2xl font-bold text-amber-600" id="pending-invoices">$0</p>
+      </div>
+      <div class="card p-6">
+       <h4 class="text-sm opacity-60 mb-2">Overdue</h4>
+       <p class="text-2xl font-bold text-rose-600" id="overdue-invoices">$0</p>
+      </div>
+     </div>
+     <div class="card p-6">
+      <h3 class="font-semibold mb-6">Invoice History</h3>
+      <div id="invoices-list" class="space-y-3">
+       <p class="text-center py-8 opacity-60">No invoices recorded</p>
+      </div>
+     </div>
+    </div><!-- Audits View -->
+    <div id="audits-view" class="view-content hidden">
+     <div class="card p-6">
+      <h3 class="font-semibold mb-6">Audit Trail &amp; Activity Log</h3>
+      <div id="audit-trail" class="space-y-3">
+       <p class="text-center py-8 opacity-60">No audit records available</p>
+      </div>
+     </div>
+    </div><!-- Reports View -->
+    <div id="reports-view" class="view-content hidden">
+     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="card p-6 cursor-pointer hover:shadow-xl transition-shadow">
+       <div class="w-12 h-12 rounded-xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center mb-4">
+        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+       </div>
+       <h4 class="font-semibold mb-2">Vendor Summary Report</h4>
+       <p class="text-sm opacity-60">Complete overview of all vendors</p>
+      </div>
+      <div class="card p-6 cursor-pointer hover:shadow-xl transition-shadow">
+       <div class="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mb-4">
+        <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        </svg>
+       </div>
+       <h4 class="font-semibold mb-2">Compliance Report</h4>
+       <p class="text-sm opacity-60">Detailed compliance status</p>
+      </div>
+      <div class="card p-6 cursor-pointer hover:shadow-xl transition-shadow">
+       <div class="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mb-4">
+        <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+       </div>
+       <h4 class="font-semibold mb-2">Financial Report</h4>
+       <p class="text-sm opacity-60">Spending analysis and forecasts</p>
+      </div>
+      <div class="card p-6 cursor-pointer hover:shadow-xl transition-shadow">
+       <div class="w-12 h-12 rounded-xl bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center mb-4">
+        <svg class="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+       </div>
+       <h4 class="font-semibold mb-2">Risk Assessment Report</h4>
+       <p class="text-sm opacity-60">Comprehensive risk analysis</p>
+      </div>
+      <div class="card p-6 cursor-pointer hover:shadow-xl transition-shadow">
+       <div class="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mb-4">
+        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+        </svg>
+       </div>
+       <h4 class="font-semibold mb-2">Performance Report</h4>
+       <p class="text-sm opacity-60">Vendor performance metrics</p>
+      </div>
+      <div class="card p-6 cursor-pointer hover:shadow-xl transition-shadow">
+       <div class="w-12 h-12 rounded-xl bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center mb-4">
+        <svg class="w-6 h-6 text-cyan-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+       </div>
+       <h4 class="font-semibold mb-2">Contract Expiration Report</h4>
+       <p class="text-sm opacity-60">Upcoming contract renewals</p>
+      </div>
+     </div>
+    </div>
+   </main>
+  </div><!-- Add/Edit Vendor Modal -->
+  <div id="vendor-modal" class="modal-overlay">
+   <div class="modal-content">
+    <div class="flex items-center justify-between mb-6">
+     <h3 id="modal-title" class="text-xl font-bold">Add New Vendor</h3><button id="close-modal" class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg></button>
+    </div>
+    <form id="vendor-form" class="space-y-4"><input type="hidden" id="vendor-id">
+     <div class="grid grid-cols-2 gap-4">
+      <div><label for="vendor-name" class="block text-sm font-medium mb-2">Vendor Name *</label> <input type="text" id="vendor-name" class="input-field" required placeholder="Enter vendor name">
+      </div>
+      <div><label for="vendor-category" class="block text-sm font-medium mb-2">Category *</label> <select id="vendor-category" class="input-field" required> <option value="">Select category</option> <option value="technology">Technology</option> <option value="marketing">Marketing</option> <option value="operations">Operations</option> <option value="finance">Finance</option> <option value="hr">Human Resources</option> </select>
+      </div>
+     </div>
+     <div class="grid grid-cols-2 gap-4">
+      <div><label for="vendor-status" class="block text-sm font-medium mb-2">Status *</label> <select id="vendor-status" class="input-field" required> <option value="active">Active</option> <option value="pending">Pending</option> <option value="inactive">Inactive</option> <option value="review">Under Review</option> </select>
+      </div>
+      <div><label for="vendor-risk" class="block text-sm font-medium mb-2">Risk Level *</label> <select id="vendor-risk" class="input-field" required> <option value="low">Low</option> <option value="medium">Medium</option> <option value="high">High</option> </select>
+      </div>
+     </div>
+     <div class="grid grid-cols-2 gap-4">
+      <div><label for="contract-value" class="block text-sm font-medium mb-2">Contract Value ($)</label> <input type="number" id="contract-value" class="input-field" placeholder="0" min="0">
+      </div>
+      <div><label for="compliance-score" class="block text-sm font-medium mb-2">Compliance Score (%)</label> <input type="number" id="compliance-score" class="input-field" placeholder="100" min="0" max="100">
+      </div>
+     </div>
+     <div class="grid grid-cols-2 gap-4">
+      <div><label for="contract-start" class="block text-sm font-medium mb-2">Contract Start</label> <input type="date" id="contract-start" class="input-field">
+      </div>
+      <div><label for="contract-end" class="block text-sm font-medium mb-2">Contract End</label> <input type="date" id="contract-end" class="input-field">
+      </div>
+     </div>
+     <div class="grid grid-cols-2 gap-4">
+      <div><label for="contact-name" class="block text-sm font-medium mb-2">Contact Name</label> <input type="text" id="contact-name" class="input-field" placeholder="Primary contact">
+      </div>
+      <div><label for="contact-email" class="block text-sm font-medium mb-2">Contact Email</label> <input type="email" id="contact-email" class="input-field" placeholder="email@vendor.com">
+      </div>
+     </div>
+     <div><label for="vendor-notes" class="block text-sm font-medium mb-2">Notes</label> <textarea id="vendor-notes" class="input-field resize-none" rows="3" placeholder="Additional notes..."></textarea>
+     </div>
+     <div class="flex justify-end gap-3 pt-4"><button type="button" id="cancel-modal" class="btn-secondary">Cancel</button> <button type="submit" id="save-vendor-btn" class="btn-primary flex items-center gap-2"> <span id="save-btn-text">Save Vendor</span>
+       <div id="save-spinner" class="loading-spinner hidden"></div></button>
+     </div>
+    </form>
+   </div>
+  </div><!-- Delete Confirmation Modal -->
+  <div id="delete-modal" class="modal-overlay">
+   <div class="modal-content max-w-md">
+    <div class="text-center">
+     <div class="w-16 h-16 mx-auto rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center mb-4">
+      <svg class="w-8 h-8 text-rose-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+      </svg>
+     </div>
+     <h3 class="text-xl font-bold mb-2">Delete Vendor</h3>
+     <p class="text-sm opacity-60 mb-6">Are you sure you want to delete <strong id="delete-vendor-name"></strong>? This action cannot be undone.</p>
+     <div class="flex justify-center gap-3"><button id="cancel-delete" class="btn-secondary">Cancel</button> <button id="confirm-delete" class="btn-primary bg-gradient-to-r from-rose-500 to-red-600 flex items-center gap-2"> <span id="delete-btn-text">Delete</span>
+       <div id="delete-spinner" class="loading-spinner hidden"></div></button>
+     </div>
+    </div>
+   </div>
+  </div><!-- Toast Notification -->
+  <div id="toast" class="toast"></div>
+  <script>
+    // Application State
+    let vendors = [];
+    let currentView = 'dashboard';
+    let isDarkMode = false;
+    let editingVendorId = null;
+    let deletingVendor = null;
+    let recordCount = 0;
+    
+    // LocalStorage keys
+    const STORAGE_KEY = 'vendorhub_vendors';
+    
+    // Load vendors from localStorage
+    function loadVendorsFromStorage() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          vendors = JSON.parse(stored);
+          recordCount = vendors.length;
+        }
+      } catch (e) {
+        console.error('Failed to load vendors from localStorage:', e);
+      }
+    }
+    
+    // Save vendors to localStorage
+    function saveVendorsToStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(vendors));
+      } catch (e) {
+        console.error('Failed to save vendors to localStorage:', e);
+      }
+    }
+    
+    const defaultConfig = {
+      dashboard_title: 'VendorHub',
+      company_name: 'Your Company',
+      company_tagline: '',
+      background_color: '#f8fafc',
+      surface_color: '#ffffff',
+      text_color: '#1e293b',
+      primary_action_color: '#6366f1',
+      secondary_action_color: '#10b981',
+      font_family: 'DM Sans',
+      font_size: 16
+    };
+    
+    // Load theme preference from localStorage
+    function loadThemePreference() {
+      const savedTheme = localStorage.getItem('vendorhub_theme');
+      if (savedTheme === 'dark') {
+        isDarkMode = true;
+        document.documentElement.classList.add('dark');
+        updateThemeUI();
+      }
+    }
+    
+    // Save theme preference to localStorage
+    function saveThemePreference() {
+      localStorage.setItem('vendorhub_theme', isDarkMode ? 'dark' : 'light');
+    }
+    
+    // Initialize SDKs
+    async function initApp() {
+      // Load theme preference
+      loadThemePreference();
+      
+      // Load vendors from localStorage first
+      loadVendorsFromStorage();
+      
+      // Initialize Element SDK (gracefully handle if not available)
+      if (window.elementSdk && typeof window.elementSdk.init === 'function') {
+        try {
+          window.elementSdk.init({
+            defaultConfig,
+            onConfigChange: async (config) => {
+              applyConfig(config);
+            },
+            mapToCapabilities: (config) => ({
+              recolorables: [
+                {
+                  get: () => config.background_color || defaultConfig.background_color,
+                  set: (v) => { config.background_color = v; if (window.elementSdk && typeof window.elementSdk.setConfig === 'function') window.elementSdk.setConfig({ background_color: v }); }
+                },
+                {
+                  get: () => config.surface_color || defaultConfig.surface_color,
+                  set: (v) => { config.surface_color = v; if (window.elementSdk && typeof window.elementSdk.setConfig === 'function') window.elementSdk.setConfig({ surface_color: v }); }
+                },
+                {
+                  get: () => config.text_color || defaultConfig.text_color,
+                  set: (v) => { config.text_color = v; if (window.elementSdk && typeof window.elementSdk.setConfig === 'function') window.elementSdk.setConfig({ text_color: v }); }
+                },
+                {
+                  get: () => config.primary_action_color || defaultConfig.primary_action_color,
+                  set: (v) => { config.primary_action_color = v; if (window.elementSdk && typeof window.elementSdk.setConfig === 'function') window.elementSdk.setConfig({ primary_action_color: v }); }
+                },
+                {
+                  get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+                  set: (v) => { config.secondary_action_color = v; if (window.elementSdk && typeof window.elementSdk.setConfig === 'function') window.elementSdk.setConfig({ secondary_action_color: v }); }
+                }
+              ],
+              borderables: [],
+              fontEditable: {
+                get: () => config.font_family || defaultConfig.font_family,
+                set: (v) => { config.font_family = v; if (window.elementSdk && typeof window.elementSdk.setConfig === 'function') window.elementSdk.setConfig({ font_family: v }); }
+              },
+              fontSizeable: {
+                get: () => config.font_size || defaultConfig.font_size,
+                set: (v) => { config.font_size = v; if (window.elementSdk && typeof window.elementSdk.setConfig === 'function') window.elementSdk.setConfig({ font_size: v }); }
+              }
+            }),
+            mapToEditPanelValues: (config) => new Map([
+              ['dashboard_title', config.dashboard_title || defaultConfig.dashboard_title],
+              ['company_name', config.company_name || defaultConfig.company_name],
+              ['company_tagline', config.company_tagline || defaultConfig.company_tagline]
+            ])
+          });
+        } catch (e) {
+          console.error('Failed to initialize Element SDK:', e);
+        }
+      }
+      
+      // Initialize Data SDK (gracefully handle if not available)
+      if (window.dataSdk && typeof window.dataSdk.init === 'function') {
+        try {
+          const result = await window.dataSdk.init({
+            onDataChanged: (data) => {
+              if (data && Array.isArray(data)) {
+                vendors = data.filter(d => d && d.type === 'vendor');
+                recordCount = data.length;
+                saveVendorsToStorage();
+                renderAll();
+              }
+            }
+          });
+          
+          if (!result || !result.isOk) {
+            console.warn('Data SDK initialization returned non-ok result, using localStorage data');
+          }
+        } catch (e) {
+          console.error('Failed to initialize Data SDK:', e);
+        }
+      }
+      
+      // Render initial data
+      renderAll();
+      setupEventListeners();
+    }
+    
+    function applyConfig(config) {
+      const bgColor = config.background_color || defaultConfig.background_color;
+      const surfaceColor = config.surface_color || defaultConfig.surface_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_action_color || defaultConfig.primary_action_color;
+      const secondaryColor = config.secondary_action_color || defaultConfig.secondary_action_color;
+      const fontFamily = config.font_family || defaultConfig.font_family;
+      const fontSize = config.font_size || defaultConfig.font_size;
+      
+      document.documentElement.style.setProperty('--bg-primary', bgColor);
+      document.documentElement.style.setProperty('--bg-secondary', surfaceColor);
+      document.documentElement.style.setProperty('--text-primary', textColor);
+      document.documentElement.style.setProperty('--accent-primary', primaryColor);
+      document.documentElement.style.setProperty('--accent-secondary', secondaryColor);
+      
+      document.body.style.fontFamily = `${fontFamily}, sans-serif`;
+      document.body.style.fontSize = `${fontSize}px`;
+      
+      const title = document.getElementById('sidebar-title');
+      const company = document.getElementById('company-name');
+      if (title) title.textContent = config.dashboard_title || defaultConfig.dashboard_title;
+      if (company) company.textContent = config.company_name || defaultConfig.company_name;
+    }
+    
+    function setupEventListeners() {
+      // Theme toggle
+      document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+      
+      // Navigation
+      document.querySelectorAll('.sidebar-item').forEach(item => {
+        item.addEventListener('click', () => switchView(item.dataset.view));
+      });
+      
+      // Mobile menu
+      document.getElementById('mobile-menu').addEventListener('click', () => {
+        document.getElementById('sidebar').classList.toggle('open');
+      });
+      
+      // Add vendor button
+      document.getElementById('add-vendor-btn').addEventListener('click', openAddModal);
+      
+      // Modal controls
+      document.getElementById('close-modal').addEventListener('click', closeModal);
+      document.getElementById('cancel-modal').addEventListener('click', closeModal);
+      document.getElementById('vendor-form').addEventListener('submit', handleFormSubmit);
+      
+      // Delete modal controls
+      document.getElementById('cancel-delete').addEventListener('click', closeDeleteModal);
+      document.getElementById('confirm-delete').addEventListener('click', confirmDelete);
+      
+      // Search
+      document.getElementById('search-input').addEventListener('input', handleSearch);
+      
+      // Filters
+      document.getElementById('filter-status').addEventListener('change', renderVendorsTable);
+      document.getElementById('filter-risk').addEventListener('change', renderVendorsTable);
+      document.getElementById('filter-category').addEventListener('change', renderVendorsTable);
+      
+      // Export
+      document.getElementById('export-btn').addEventListener('click', exportData);
+      
+      // Close modal on overlay click
+      document.getElementById('vendor-modal').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeModal();
+      });
+      document.getElementById('delete-modal').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeDeleteModal();
+      });
+    }
+    
+    function toggleTheme() {
+      isDarkMode = !isDarkMode;
+      if (isDarkMode) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+      saveThemePreference();
+      updateThemeUI();
+    }
+    
+    function updateThemeUI() {
+      const lightIcon = document.getElementById('theme-icon-light');
+      const darkIcon = document.getElementById('theme-icon-dark');
+      const themeText = document.getElementById('theme-text');
+      
+      if (lightIcon && darkIcon && themeText) {
+        if (isDarkMode) {
+          lightIcon.classList.add('hidden');
+          darkIcon.classList.remove('hidden');
+          themeText.textContent = 'Light Mode';
+        } else {
+          lightIcon.classList.remove('hidden');
+          darkIcon.classList.add('hidden');
+          themeText.textContent = 'Dark Mode';
+        }
+      }
+    }
+    
+    function switchView(view) {
+      currentView = view;
+      
+      // Update sidebar active state
+      document.querySelectorAll('.sidebar-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.view === view);
+      });
+      
+      // Show/hide view content
+      document.querySelectorAll('.view-content').forEach(content => {
+        content.classList.add('hidden');
+      });
+      document.getElementById(`${view}-view`).classList.remove('hidden');
+      
+      // Update page title
+      const titles = {
+        dashboard: 'Dashboard',
+        vendors: 'Vendor Management',
+        contracts: 'Contract Overview',
+        compliance: 'Compliance Center',
+        analytics: 'Analytics & Reports',
+        risk: 'Risk Assessment',
+        performance: 'Performance Tracking',
+        documents: 'Document Repository',
+        invoices: 'Invoice Management',
+        audits: 'Audit Trail',
+        reports: 'Reports & Exports'
+      };
+      document.getElementById('page-title').textContent = titles[view];
+      
+      // Close mobile sidebar
+      document.getElementById('sidebar').classList.remove('open');
+      
+      renderAll();
+    }
+    
+    function openAddModal() {
+      if (recordCount >= 999) {
+        showToast('Maximum limit of 999 records reached. Please delete some vendors first.', 'error');
+        return;
+      }
+      
+      editingVendorId = null;
+      document.getElementById('modal-title').textContent = 'Add New Vendor';
+      document.getElementById('vendor-form').reset();
+      document.getElementById('vendor-id').value = '';
+      document.getElementById('vendor-modal').classList.add('active');
+    }
+    
+    function openEditModal(vendor) {
+      editingVendorId = vendor.__backendId;
+      document.getElementById('modal-title').textContent = 'Edit Vendor';
+      
+      document.getElementById('vendor-id').value = vendor.__backendId;
+      document.getElementById('vendor-name').value = vendor.name || '';
+      document.getElementById('vendor-category').value = vendor.category || '';
+      document.getElementById('vendor-status').value = vendor.status || 'active';
+      document.getElementById('vendor-risk').value = vendor.risk_level || 'low';
+      document.getElementById('contract-value').value = vendor.contract_value || '';
+      document.getElementById('compliance-score').value = vendor.compliance_score || '';
+      document.getElementById('contract-start').value = vendor.contract_start || '';
+      document.getElementById('contract-end').value = vendor.contract_end || '';
+      document.getElementById('contact-name').value = vendor.contact_name || '';
+      document.getElementById('contact-email').value = vendor.contact_email || '';
+      document.getElementById('vendor-notes').value = vendor.notes || '';
+      
+      document.getElementById('vendor-modal').classList.add('active');
+    }
+    
+    function closeModal() {
+      document.getElementById('vendor-modal').classList.remove('active');
+      editingVendorId = null;
+    }
+    
+    function openDeleteModal(vendor) {
+      deletingVendor = vendor;
+      document.getElementById('delete-vendor-name').textContent = vendor.name;
+      document.getElementById('delete-modal').classList.add('active');
+    }
+    
+    function closeDeleteModal() {
+      document.getElementById('delete-modal').classList.remove('active');
+      deletingVendor = null;
+    }
+    
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+      
+      const saveBtn = document.getElementById('save-vendor-btn');
+      const saveBtnText = document.getElementById('save-btn-text');
+      const saveSpinner = document.getElementById('save-spinner');
+      
+      saveBtn.disabled = true;
+      saveBtnText.textContent = 'Saving...';
+      saveSpinner.classList.remove('hidden');
+      
+      const vendorData = {
+        type: 'vendor',
+        name: document.getElementById('vendor-name').value,
+        category: document.getElementById('vendor-category').value,
+        status: document.getElementById('vendor-status').value,
+        risk_level: document.getElementById('vendor-risk').value,
+        contract_value: parseFloat(document.getElementById('contract-value').value) || 0,
+        compliance_score: parseInt(document.getElementById('compliance-score').value) || 100,
+        contract_start: document.getElementById('contract-start').value,
+        contract_end: document.getElementById('contract-end').value,
+        contact_name: document.getElementById('contact-name').value,
+        contact_email: document.getElementById('contact-email').value,
+        notes: document.getElementById('vendor-notes').value,
+        last_review: new Date().toISOString(),
+        created_at: new Date().toISOString()
+      };
+      
+      let result = { isOk: true };
+      
+      try {
+        if (editingVendorId) {
+          const existingVendor = vendors.find(v => v.__backendId === editingVendorId);
+          if (existingVendor && window.dataSdk && typeof window.dataSdk.update === 'function') {
+            result = await window.dataSdk.update({ ...existingVendor, ...vendorData });
+          }
+        } else if (window.dataSdk && typeof window.dataSdk.create === 'function') {
+          result = await window.dataSdk.create(vendorData);
+        }
+      } catch (e) {
+        console.error('DataSdk operation failed, using localStorage:', e);
+        result = { isOk: true };
+      }
+      
+      saveBtn.disabled = false;
+      saveBtnText.textContent = 'Save Vendor';
+      saveSpinner.classList.add('hidden');
+      
+      if (result && (result.isOk || result === true)) {
+        if (editingVendorId) {
+          const existingVendor = vendors.find(v => v.__backendId === editingVendorId);
+          if (existingVendor) {
+            Object.assign(existingVendor, vendorData);
+          }
+        } else {
+          vendorData.__backendId = Math.random().toString(36).substr(2, 9);
+          if (!vendorData.created_at) vendorData.created_at = new Date().toISOString();
+          vendors.push(vendorData);
+          recordCount++;
+        }
+        
+        saveVendorsToStorage();
+        renderAll();
+        showToast(editingVendorId ? 'Vendor updated successfully!' : 'Vendor added successfully!', 'success');
+        closeModal();
+      } else {
+        showToast('Failed to save vendor. Please try again.', 'error');
+      }
+    }
+    
+    async function confirmDelete() {
+      if (!deletingVendor) return;
+      
+      const deleteBtn = document.getElementById('confirm-delete');
+      const deleteBtnText = document.getElementById('delete-btn-text');
+      const deleteSpinner = document.getElementById('delete-spinner');
+      
+      deleteBtn.disabled = true;
+      deleteBtnText.textContent = 'Deleting...';
+      deleteSpinner.classList.remove('hidden');
+      
+      let result = { isOk: true };
+      
+      try {
+        if (window.dataSdk && typeof window.dataSdk.delete === 'function') {
+          result = await window.dataSdk.delete(deletingVendor);
+        }
+      } catch (e) {
+        console.error('DataSdk delete operation failed, using localStorage:', e);
+        result = { isOk: true };
+      }
+      
+      deleteBtn.disabled = false;
+      deleteBtnText.textContent = 'Delete';
+      deleteSpinner.classList.add('hidden');
+      
+      if (result && (result.isOk || result === true)) {
+        const index = vendors.findIndex(v => v.__backendId === deletingVendor.__backendId);
+        if (index !== -1) {
+          vendors.splice(index, 1);
+          recordCount--;
+        }
+        
+        saveVendorsToStorage();
+        renderAll();
+        showToast('Vendor deleted successfully!', 'success');
+        closeDeleteModal();
+      } else {
+        showToast('Failed to delete vendor. Please try again.', 'error');
+      }
+    }
+    
+    function handleSearch(e) {
+      const query = e.target.value.toLowerCase();
+      
+      if (currentView === 'vendors') {
+        renderVendorsTable(query);
+      }
+    }
+    
+    function getFilteredVendors(searchQuery = '') {
+      const statusFilter = document.getElementById('filter-status').value;
+      const riskFilter = document.getElementById('filter-risk').value;
+      const categoryFilter = document.getElementById('filter-category').value;
+      
+      return vendors.filter(v => {
+        const matchesSearch = !searchQuery || 
+          v.name.toLowerCase().includes(searchQuery) ||
+          (v.contact_name && v.contact_name.toLowerCase().includes(searchQuery));
+        const matchesStatus = !statusFilter || v.status === statusFilter;
+        const matchesRisk = !riskFilter || v.risk_level === riskFilter;
+        const matchesCategory = !categoryFilter || v.category === categoryFilter;
+        
+        return matchesSearch && matchesStatus && matchesRisk && matchesCategory;
+      });
+    }
+    
+    function renderAll() {
+      renderDashboard();
+      renderVendorsTable();
+      renderContracts();
+      renderCompliance();
+      renderAnalytics();
+      renderRiskAssessment();
+      renderPerformance();
+      renderDocuments();
+      renderInvoices();
+      renderAudits();
+    }
+    
+    function renderRiskAssessment() {
+      const highRisk = vendors.filter(v => v.risk_level === 'high').length;
+      const mediumRisk = vendors.filter(v => v.risk_level === 'medium').length;
+      const lowRisk = vendors.filter(v => v.risk_level === 'low').length;
+      
+      document.getElementById('critical-risks').textContent = highRisk;
+      document.getElementById('medium-risks').textContent = mediumRisk;
+      document.getElementById('low-risks').textContent = lowRisk;
+      
+      const riskMatrix = document.getElementById('risk-matrix');
+      if (vendors.length === 0) {
+        riskMatrix.innerHTML = '<p class="text-center py-8 opacity-60">No risk assessments available</p>';
+      } else {
+        riskMatrix.innerHTML = vendors.map(v => `
+          <div class="flex items-center justify-between p-4 rounded-xl theme-bg-primary">
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold">
+                ${v.name.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <h4 class="font-medium">${escapeHtml(v.name)}</h4>
+                <p class="text-xs opacity-60">${capitalize(v.category || 'Uncategorized')}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <span class="status-badge risk-${v.risk_level}">${capitalize(v.risk_level)} Risk</span>
+              <span class="text-sm opacity-60">Score: ${v.compliance_score || 0}%</span>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+    
+    function renderPerformance() {
+      const performanceCard = document.getElementById('performance-scorecard');
+      if (vendors.length === 0) {
+        performanceCard.innerHTML = '<p class="text-center py-8 opacity-60">No performance data available</p>';
+      } else {
+        performanceCard.innerHTML = vendors.map(v => {
+          const score = v.compliance_score || 0;
+          const performance = score >= 80 ? 'Excellent' : score >= 60 ? 'Good' : score >= 40 ? 'Fair' : 'Poor';
+          const color = score >= 80 ? 'emerald' : score >= 60 ? 'indigo' : score >= 40 ? 'amber' : 'rose';
+          
+          return `
+            <div class="flex items-center justify-between p-4 rounded-xl theme-bg-primary">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold">
+                  ${v.name.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <h4 class="font-medium">${escapeHtml(v.name)}</h4>
+                  <p class="text-xs opacity-60">Contract Value: $${formatNumber(v.contract_value || 0)}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-4">
+                <div class="text-right">
+                  <p class="text-sm font-medium text-${color}-600">${performance}</p>
+                  <p class="text-xs opacity-60">${score}% Score</p>
+                </div>
+                <div class="progress-bar w-32">
+                  <div class="progress-fill bg-${color}-500" style="width: ${score}%"></div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+    
+    function renderDocuments() {
+      const docsList = document.getElementById('documents-list');
+      const vendorsWithNotes = vendors.filter(v => v.notes && v.notes.trim().length > 0);
+      
+      if (vendorsWithNotes.length === 0) {
+        docsList.innerHTML = '<p class="text-center py-8 opacity-60">No documents uploaded yet</p>';
+      } else {
+        docsList.innerHTML = vendorsWithNotes.map(v => `
+          <div class="flex items-center justify-between p-4 rounded-xl theme-bg-primary">
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
+                <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+              </div>
+              <div>
+                <h4 class="font-medium">${escapeHtml(v.name)} - Notes</h4>
+                <p class="text-xs opacity-60">${formatDate(v.last_review)}</p>
+              </div>
+            </div>
+            <button class="btn-secondary py-2 px-4 text-sm" onclick="openEditModal(vendors.find(vd => vd.__backendId === '${v.__backendId}'))">View</button>
+          </div>
+        `).join('');
+      }
+    }
+    
+    function renderInvoices() {
+      const totalValue = vendors.reduce((sum, v) => sum + (v.contract_value || 0), 0);
+      const paid = Math.floor(totalValue * 0.65);
+      const pending = Math.floor(totalValue * 0.25);
+      const overdue = totalValue - paid - pending;
+      
+      document.getElementById('total-invoiced').textContent = `$${formatNumber(totalValue)}`;
+      document.getElementById('paid-invoices').textContent = `$${formatNumber(paid)}`;
+      document.getElementById('pending-invoices').textContent = `$${formatNumber(pending)}`;
+      document.getElementById('overdue-invoices').textContent = `$${formatNumber(overdue)}`;
+      
+      const invoicesList = document.getElementById('invoices-list');
+      if (vendors.length === 0) {
+        invoicesList.innerHTML = '<p class="text-center py-8 opacity-60">No invoices recorded</p>';
+      } else {
+        invoicesList.innerHTML = vendors.slice(0, 10).map((v, i) => {
+          const statuses = ['paid', 'paid', 'paid', 'pending', 'overdue'];
+          const status = statuses[i % statuses.length];
+          const statusColors = { paid: 'emerald', pending: 'amber', overdue: 'rose' };
+          const color = statusColors[status];
+          
+          return `
+            <div class="flex items-center justify-between p-4 rounded-xl theme-bg-primary">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-xl bg-${color}-100 dark:bg-${color}-900/30 flex items-center justify-center">
+                  <svg class="w-5 h-5 text-${color}-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/>
+                  </svg>
+                </div>
+                <div>
+                  <h4 class="font-medium">${escapeHtml(v.name)}</h4>
+                  <p class="text-xs opacity-60">Invoice #${1000 + i} - ${formatDate(v.contract_start || v.created_at)}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-4">
+                <p class="font-medium">$${formatNumber(v.contract_value || 0)}</p>
+                <span class="status-badge status-${status}">${capitalize(status)}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+    
+    function renderAudits() {
+      const auditTrail = document.getElementById('audit-trail');
+      
+      // Create audit log from vendor activities
+      const auditLogs = [];
+      vendors.forEach(v => {
+        auditLogs.push({
+          vendor: v.name,
+          action: 'Created',
+          timestamp: v.created_at,
+          user: 'System'
+        });
+        if (v.last_review && v.last_review !== v.created_at) {
+          auditLogs.push({
+            vendor: v.name,
+            action: 'Updated',
+            timestamp: v.last_review,
+            user: 'Admin'
+          });
+        }
+      });
+      
+      auditLogs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      
+      if (auditLogs.length === 0) {
+        auditTrail.innerHTML = '<p class="text-center py-8 opacity-60">No audit records available</p>';
+      } else {
+        auditTrail.innerHTML = auditLogs.slice(0, 20).map(log => {
+          const actionColors = { Created: 'emerald', Updated: 'indigo', Deleted: 'rose' };
+          const color = actionColors[log.action] || 'gray';
+          
+          return `
+            <div class="flex items-center justify-between p-4 rounded-xl theme-bg-primary">
+              <div class="flex items-center gap-4">
+                <div class="w-2 h-2 rounded-full bg-${color}-500"></div>
+                <div>
+                  <h4 class="font-medium">${log.action}: ${escapeHtml(log.vendor)}</h4>
+                  <p class="text-xs opacity-60">By ${log.user} on ${formatDate(log.timestamp)}</p>
+                </div>
+              </div>
+              <span class="text-xs opacity-60">${new Date(log.timestamp).toLocaleTimeString()}</span>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+    
+    function renderDashboard() {
+      // Stats
+      const activeVendors = vendors.filter(v => v.status === 'active').length;
+      const pendingReview = vendors.filter(v => v.status === 'review' || v.status === 'pending').length;
+      const highRisk = vendors.filter(v => v.risk_level === 'high').length;
+      
+      document.getElementById('stat-total-vendors').textContent = vendors.length;
+      document.getElementById('stat-active-vendors').textContent = activeVendors;
+      document.getElementById('stat-pending-review').textContent = pendingReview;
+      document.getElementById('stat-high-risk').textContent = highRisk;
+      
+      // Category chart
+      const categories = ['technology', 'marketing', 'operations', 'finance', 'hr'];
+      const categoryValues = categories.map(cat => 
+        vendors.filter(v => v.category === cat).reduce((sum, v) => sum + (v.contract_value || 0), 0)
+      );
+      const maxValue = Math.max(...categoryValues, 1);
+      
+      const chartContainer = document.getElementById('category-chart');
+      chartContainer.innerHTML = categoryValues.map((value, i) => `
+        <div class="flex-1 flex flex-col items-center">
+          <div class="chart-bar w-full" style="height: ${(value / maxValue) * 100}%"></div>
+          <span class="text-xs mt-2 font-medium">$${formatNumber(value)}</span>
+        </div>
+      `).join('');
+      
+      // Compliance overview
+      const avgCompliance = vendors.length > 0 
+        ? Math.round(vendors.reduce((sum, v) => sum + (v.compliance_score || 0), 0) / vendors.length)
+        : 0;
+      const docsComplete = vendors.filter(v => v.notes && v.notes.length > 0).length;
+      const riskAssessed = vendors.filter(v => v.risk_level).length;
+      const contractsValid = vendors.filter(v => v.contract_end && new Date(v.contract_end) > new Date()).length;
+      
+      const docsPercent = vendors.length > 0 ? Math.round((docsComplete / vendors.length) * 100) : 0;
+      const riskPercent = vendors.length > 0 ? Math.round((riskAssessed / vendors.length) * 100) : 0;
+      const renewalPercent = vendors.length > 0 ? Math.round((contractsValid / vendors.length) * 100) : 0;
+      
+      document.getElementById('compliance-overall').textContent = `${avgCompliance}%`;
+      document.getElementById('compliance-bar-overall').style.width = `${avgCompliance}%`;
+      document.getElementById('compliance-docs').textContent = `${docsPercent}%`;
+      document.getElementById('compliance-bar-docs').style.width = `${docsPercent}%`;
+      document.getElementById('compliance-risk').textContent = `${riskPercent}%`;
+      document.getElementById('compliance-bar-risk').style.width = `${riskPercent}%`;
+      document.getElementById('compliance-renewal').textContent = `${renewalPercent}%`;
+      document.getElementById('compliance-bar-renewal').style.width = `${renewalPercent}%`;
+      
+      // Recent vendors
+      const recentVendorsList = document.getElementById('recent-vendors-list');
+      const recentVendors = [...vendors].sort((a, b) => 
+        new Date(b.created_at) - new Date(a.created_at)
+      ).slice(0, 5);
+      
+      if (recentVendors.length === 0) {
+        recentVendorsList.innerHTML = '<p class="text-center py-8 opacity-60">No vendors yet. Add your first vendor to get started!</p>';
+      } else {
+        recentVendorsList.innerHTML = recentVendors.map(v => `
+          <div class="flex items-center justify-between p-4 rounded-xl theme-bg-primary fade-in">
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold">
+                ${v.name.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <h4 class="font-medium">${escapeHtml(v.name)}</h4>
+                <p class="text-xs opacity-60">${capitalize(v.category || 'Uncategorized')}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="status-badge status-${v.status}">${capitalize(v.status)}</span>
+              <span class="status-badge risk-${v.risk_level}">${capitalize(v.risk_level)} Risk</span>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+    
+    function renderVendorsTable(searchQuery = '') {
+      const filtered = getFilteredVendors(searchQuery);
+      const tbody = document.getElementById('vendors-table-body');
+      
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center opacity-60">No vendors found</td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = filtered.map(v => `
+        <tr class="table-row border-b theme-border" data-id="${v.__backendId}">
+          <td class="p-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold shrink-0">
+                ${v.name.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <p class="font-medium">${escapeHtml(v.name)}</p>
+                <p class="text-xs opacity-60">${escapeHtml(v.contact_email || 'No email')}</p>
+              </div>
+            </div>
+          </td>
+          <td class="p-4">${capitalize(v.category || 'N/A')}</td>
+          <td class="p-4"><span class="status-badge status-${v.status}">${capitalize(v.status)}</span></td>
+          <td class="p-4"><span class="status-badge risk-${v.risk_level}">${capitalize(v.risk_level)}</span></td>
+          <td class="p-4 font-medium">$${formatNumber(v.contract_value || 0)}</td>
+          <td class="p-4">
+            <div class="flex items-center gap-2">
+              <div class="progress-bar w-20">
+                <div class="progress-fill ${v.compliance_score >= 80 ? 'bg-emerald-500' : v.compliance_score >= 50 ? 'bg-amber-500' : 'bg-rose-500'}" style="width: ${v.compliance_score || 0}%"></div>
+              </div>
+              <span class="text-sm">${v.compliance_score || 0}%</span>
+            </div>
+          </td>
+          <td class="p-4">
+            <div class="flex items-center gap-2">
+              <button onclick="openEditModal(vendors.find(v => v.__backendId === '${v.__backendId}'))" class="p-2 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/30 text-indigo-600 transition-colors" title="Edit">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+              </button>
+              <button onclick="openDeleteModal(vendors.find(v => v.__backendId === '${v.__backendId}'))" class="p-2 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-900/30 text-rose-600 transition-colors" title="Delete">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+    
+    function renderContracts() {
+      const totalValue = vendors.reduce((sum, v) => sum + (v.contract_value || 0), 0);
+      const now = new Date();
+      const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      const expiring = vendors.filter(v => {
+        if (!v.contract_end) return false;
+        const endDate = new Date(v.contract_end);
+        return endDate >= now && endDate <= monthEnd;
+      }).length;
+      
+      let totalDuration = 0;
+      let contractCount = 0;
+      vendors.forEach(v => {
+        if (v.contract_start && v.contract_end) {
+          const start = new Date(v.contract_start);
+          const end = new Date(v.contract_end);
+          const months = Math.round((end - start) / (1000 * 60 * 60 * 24 * 30));
+          totalDuration += months;
+          contractCount++;
+        }
+      });
+      const avgDuration = contractCount > 0 ? Math.round(totalDuration / contractCount) : 0;
+      
+      document.getElementById('total-contract-value').textContent = `$${formatNumber(totalValue)}`;
+      document.getElementById('expiring-contracts').textContent = expiring;
+      document.getElementById('avg-contract-duration').textContent = `${avgDuration} months`;
+      
+      // Timeline
+      const timeline = document.getElementById('contracts-timeline');
+      const sortedVendors = [...vendors].filter(v => v.contract_end).sort((a, b) => 
+        new Date(a.contract_end) - new Date(b.contract_end)
+      );
+      
+      if (sortedVendors.length === 0) {
+        timeline.innerHTML = '<p class="text-center py-8 opacity-60">No contracts to display</p>';
+      } else {
+        timeline.innerHTML = sortedVendors.slice(0, 10).map(v => {
+          const endDate = new Date(v.contract_end);
+          const daysLeft = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24));
+          const isExpired = daysLeft < 0;
+          const isExpiring = daysLeft >= 0 && daysLeft <= 30;
+          
+          return `
+            <div class="flex items-center gap-4 p-4 rounded-xl theme-bg-primary">
+              <div class="w-12 h-12 rounded-xl ${isExpired ? 'bg-rose-100 dark:bg-rose-900/30' : isExpiring ? 'bg-amber-100 dark:bg-amber-900/30' : 'bg-emerald-100 dark:bg-emerald-900/30'} flex items-center justify-center shrink-0">
+                <svg class="w-6 h-6 ${isExpired ? 'text-rose-600' : isExpiring ? 'text-amber-600' : 'text-emerald-600'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+              </div>
+              <div class="flex-1">
+                <h4 class="font-medium">${escapeHtml(v.name)}</h4>
+                <p class="text-sm opacity-60">${formatDate(v.contract_start)} - ${formatDate(v.contract_end)}</p>
+              </div>
+              <div class="text-right">
+                <p class="font-bold">$${formatNumber(v.contract_value || 0)}</p>
+                <p class="text-xs ${isExpired ? 'text-rose-600' : isExpiring ? 'text-amber-600' : 'text-emerald-600'}">
+                  ${isExpired ? 'Expired' : daysLeft === 0 ? 'Expires today' : `${daysLeft} days left`}
+                </p>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+    
+    function renderCompliance() {
+      const avgCompliance = vendors.length > 0 
+        ? Math.round(vendors.reduce((sum, v) => sum + (v.compliance_score || 0), 0) / vendors.length)
+        : 0;
+      
+      document.getElementById('compliance-score-display').textContent = `${avgCompliance}%`;
+      
+      // Compliance by category
+      const categories = ['technology', 'marketing', 'operations', 'finance', 'hr'];
+      const categoryCompliance = document.getElementById('compliance-by-category');
+      
+      const categoryData = categories.map(cat => {
+        const catVendors = vendors.filter(v => v.category === cat);
+        const avg = catVendors.length > 0 
+          ? Math.round(catVendors.reduce((sum, v) => sum + (v.compliance_score || 0), 0) / catVendors.length)
+          : 0;
+        return { category: cat, score: avg, count: catVendors.length };
+      }).filter(c => c.count > 0);
+      
+      if (categoryData.length === 0) {
+        categoryCompliance.innerHTML = '<p class="text-sm opacity-60">No data available</p>';
+      } else {
+        categoryCompliance.innerHTML = categoryData.map(c => `
+          <div class="flex items-center justify-between">
+            <span class="text-sm">${capitalize(c.category)}</span>
+            <div class="flex items-center gap-2">
+              <div class="progress-bar w-24">
+                <div class="progress-fill ${c.score >= 80 ? 'bg-emerald-500' : c.score >= 50 ? 'bg-amber-500' : 'bg-rose-500'}" style="width: ${c.score}%"></div>
+              </div>
+              <span class="text-sm font-medium w-12 text-right">${c.score}%</span>
+            </div>
+          </div>
+        `).join('');
+      }
+      
+      // Action items
+      const actions = document.getElementById('compliance-actions');
+      const lowCompliance = vendors.filter(v => (v.compliance_score || 0) < 70);
+      const expiringSoon = vendors.filter(v => {
+        if (!v.contract_end) return false;
+        const daysLeft = Math.ceil((new Date(v.contract_end) - new Date()) / (1000 * 60 * 60 * 24));
+        return daysLeft >= 0 && daysLeft <= 30;
+      });
+      const highRiskVendors = vendors.filter(v => v.risk_level === 'high');
+      
+      const actionItems = [];
+      if (lowCompliance.length > 0) actionItems.push(`Review ${lowCompliance.length} vendor(s) with low compliance scores`);
+      if (expiringSoon.length > 0) actionItems.push(`${expiringSoon.length} contract(s) expiring within 30 days`);
+      if (highRiskVendors.length > 0) actionItems.push(`${highRiskVendors.length} high-risk vendor(s) require attention`);
+      
+      if (actionItems.length === 0) {
+        actions.innerHTML = '<p class="text-sm text-emerald-600">✓ All compliance items are up to date!</p>';
+      } else {
+        actions.innerHTML = actionItems.map(item => `
+          <div class="flex items-center gap-2 text-sm">
+            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+            <span>${item}</span>
+          </div>
+        `).join('');
+      }
+      
+      // Compliance details
+      const detailsList = document.getElementById('compliance-details-list');
+      if (vendors.length === 0) {
+        detailsList.innerHTML = '<p class="text-center py-8 opacity-60">No vendors to review</p>';
+      } else {
+        detailsList.innerHTML = vendors.map(v => `
+          <div class="flex items-center justify-between p-4 rounded-xl theme-bg-primary">
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold">
+                ${v.name.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <h4 class="font-medium">${escapeHtml(v.name)}</h4>
+                <p class="text-xs opacity-60">Last reviewed: ${v.last_review ? formatDate(v.last_review) : 'Never'}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="text-right">
+                <div class="flex items-center gap-2">
+                  <div class="progress-bar w-24">
+                    <div class="progress-fill ${(v.compliance_score || 0) >= 80 ? 'bg-emerald-500' : (v.compliance_score || 0) >= 50 ? 'bg-amber-500' : 'bg-rose-500'}" style="width: ${v.compliance_score || 0}%"></div>
+                  </div>
+                  <span class="font-medium">${v.compliance_score || 0}%</span>
+                </div>
+              </div>
+              <span class="status-badge risk-${v.risk_level}">${capitalize(v.risk_level)}</span>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+    
+    function renderAnalytics() {
+      // Spend chart (quarterly simulation based on created dates)
+      const spendChart = document.getElementById('spend-chart');
+      const quarterlySpend = [0, 0, 0, 0];
+      
+      vendors.forEach(v => {
+        const created = new Date(v.created_at);
+        const quarter = Math.floor(created.getMonth() / 3);
+        quarterlySpend[quarter] += v.contract_value || 0;
+      });
+      
+      const maxSpend = Math.max(...quarterlySpend, 1);
+      spendChart.innerHTML = quarterlySpend.map((spend, i) => `
+        <div class="flex-1 flex flex-col items-center justify-end h-full">
+          <div class="chart-bar w-full" style="height: ${(spend / maxSpend) * 100}%"></div>
+          <span class="text-xs mt-2 font-medium">$${formatNumber(spend)}</span>
+        </div>
+      `).join('');
+      
+      // Risk distribution
+      const lowRisk = vendors.filter(v => v.risk_level === 'low').length;
+      const mediumRisk = vendors.filter(v => v.risk_level === 'medium').length;
+      const highRisk = vendors.filter(v => v.risk_level === 'high').length;
+      
+      document.getElementById('risk-low-count').textContent = lowRisk;
+      document.getElementById('risk-medium-count').textContent = mediumRisk;
+      document.getElementById('risk-high-count').textContent = highRisk;
+      
+      // Category breakdown
+      const categoryBreakdown = document.getElementById('category-breakdown');
+      const categories = [
+        { key: 'technology', label: 'Technology', icon: '💻' },
+        { key: 'marketing', label: 'Marketing', icon: '📢' },
+        { key: 'operations', label: 'Operations', icon: '⚙️' },
+        { key: 'finance', label: 'Finance', icon: '💰' },
+        { key: 'hr', label: 'HR', icon: '👥' }
+      ];
+      
+      categoryBreakdown.innerHTML = categories.map(cat => {
+        const catVendors = vendors.filter(v => v.category === cat.key);
+        const totalValue = catVendors.reduce((sum, v) => sum + (v.contract_value || 0), 0);
+        return `
+          <div class="card p-4 text-center">
+            <div class="text-3xl mb-2">${cat.icon}</div>
+            <h4 class="font-medium text-sm">${cat.label}</h4>
+            <p class="text-2xl font-bold">${catVendors.length}</p>
+            <p class="text-xs opacity-60">$${formatNumber(totalValue)}</p>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    function exportData() {
+      if (vendors.length === 0) {
+        showToast('No data to export', 'error');
+        return;
+      }
+      
+      const headers = ['Name', 'Category', 'Status', 'Risk Level', 'Contract Value', 'Compliance Score', 'Contract Start', 'Contract End', 'Contact Name', 'Contact Email'];
+      const rows = vendors.map(v => [
+        v.name,
+        v.category,
+        v.status,
+        v.risk_level,
+        v.contract_value || 0,
+        v.compliance_score || 0,
+        v.contract_start || '',
+        v.contract_end || '',
+        v.contact_name || '',
+        v.contact_email || ''
+      ]);
+      
+      const csv = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'vendors_export.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      showToast('Data exported successfully!', 'success');
+    }
+    
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = `toast ${type} show`;
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+    
+    // Helper functions
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    function capitalize(str) {
+      return str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
+    }
+    
+    function formatNumber(num) {
+      if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+      if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+      return num.toLocaleString();
+    }
+    
+    function formatDate(dateStr) {
+      if (!dateStr) return 'N/A';
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+    
+    // Initialize the app
+    initApp();
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9bff6bf2846a3550',t:'MTc2ODc1MzI0Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
