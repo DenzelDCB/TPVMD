@@ -244,9 +244,33 @@
       <div class="relative"><input type="text" id="search-input" placeholder="Search vendors..." class="input-field pl-10 w-64">
        <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 opacity-40" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
        </svg>
-      </div><button id="add-vendor-btn" class="btn-primary flex items-center gap-2">
-       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-       </svg><span>Add Vendor</span> </button>
+      </div>
+      <div class="flex items-center gap-2">
+       <button id="add-vendor-btn" class="btn-primary flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg><span>Add Vendor</span>
+       </button>
+       <div class="relative group">
+        <button class="btn-secondary flex items-center gap-2 py-2 px-3">
+         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14M5 12h14" />
+         </svg><span>More</span>
+        </button>
+        <div class="absolute right-0 mt-1 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg hidden group-hover:block z-40 py-1">
+         <button onclick="openAddContractModal()" class="block w-full text-left px-4 py-2 hover:bg-indigo-50 dark:hover:bg-slate-700 flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>Add Contract
+         </button>
+         <button onclick="openAddDocumentModal()" class="block w-full text-left px-4 py-2 hover:bg-indigo-50 dark:hover:bg-slate-700 flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+          </svg>Add Document
+         </button>
+         <button onclick="openAddInvoiceModal()" class="block w-full text-left px-4 py-2 hover:bg-indigo-50 dark:hover:bg-slate-700 flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
+          </svg>Add Invoice
+         </button>
+        </div>
+       </div>
+      </div>
      </div>
     </header><!-- Dashboard View -->
     <div id="dashboard-view" class="view-content"><!-- Stats Cards -->
@@ -647,6 +671,9 @@
   <script>
     // Application State
     let vendors = [];
+    let contracts = [];
+    let documents = [];
+    let invoices = [];
     let currentView = 'dashboard';
     let isDarkMode = false;
     let editingVendorId = null;
@@ -654,28 +681,58 @@
     let recordCount = 0;
     
     // LocalStorage keys
-    const STORAGE_KEY = 'vendorhub_vendors';
+    const STORAGE_KEY_VENDORS = 'vendorhub_vendors';
+    const STORAGE_KEY_CONTRACTS = 'vendorhub_contracts';
+    const STORAGE_KEY_DOCUMENTS = 'vendorhub_documents';
+    const STORAGE_KEY_INVOICES = 'vendorhub_invoices';
     
-    // Load vendors from localStorage
-    function loadVendorsFromStorage() {
+    // Load all data from localStorage
+    function loadDataFromStorage() {
       try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-          vendors = JSON.parse(stored);
+        const storedVendors = localStorage.getItem(STORAGE_KEY_VENDORS);
+        if (storedVendors) {
+          vendors = JSON.parse(storedVendors);
           recordCount = vendors.length;
         }
+        
+        const storedContracts = localStorage.getItem(STORAGE_KEY_CONTRACTS);
+        if (storedContracts) {
+          contracts = JSON.parse(storedContracts);
+        }
+        
+        const storedDocuments = localStorage.getItem(STORAGE_KEY_DOCUMENTS);
+        if (storedDocuments) {
+          documents = JSON.parse(storedDocuments);
+        }
+        
+        const storedInvoices = localStorage.getItem(STORAGE_KEY_INVOICES);
+        if (storedInvoices) {
+          invoices = JSON.parse(storedInvoices);
+        }
       } catch (e) {
-        console.error('Failed to load vendors from localStorage:', e);
+        console.error('Failed to load data from localStorage:', e);
       }
     }
     
-    // Save vendors to localStorage
-    function saveVendorsToStorage() {
+    // Save all data to localStorage
+    function saveDataToStorage() {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(vendors));
+        localStorage.setItem(STORAGE_KEY_VENDORS, JSON.stringify(vendors));
+        localStorage.setItem(STORAGE_KEY_CONTRACTS, JSON.stringify(contracts));
+        localStorage.setItem(STORAGE_KEY_DOCUMENTS, JSON.stringify(documents));
+        localStorage.setItem(STORAGE_KEY_INVOICES, JSON.stringify(invoices));
       } catch (e) {
-        console.error('Failed to save vendors to localStorage:', e);
+        console.error('Failed to save data to localStorage:', e);
       }
+    }
+    
+    // Backward compatibility
+    function loadVendorsFromStorage() {
+      loadDataFromStorage();
+    }
+    
+    function saveVendorsToStorage() {
+      saveDataToStorage();
     }
     
     const defaultConfig = {
@@ -711,8 +768,8 @@
       // Load theme preference
       loadThemePreference();
       
-      // Load vendors from localStorage first
-      loadVendorsFromStorage();
+      // Load all data from localStorage first
+      loadDataFromStorage();
       
       // Initialize Element SDK (gracefully handle if not available)
       if (window.elementSdk && typeof window.elementSdk.init === 'function') {
@@ -773,8 +830,11 @@
             onDataChanged: (data) => {
               if (data && Array.isArray(data)) {
                 vendors = data.filter(d => d && d.type === 'vendor');
+                contracts = data.filter(d => d && d.type === 'contract');
+                documents = data.filter(d => d && d.type === 'document');
+                invoices = data.filter(d => d && d.type === 'invoice');
                 recordCount = data.length;
-                saveVendorsToStorage();
+                saveDataToStorage();
                 renderAll();
               }
             }
@@ -1038,7 +1098,7 @@
           recordCount++;
         }
         
-        saveVendorsToStorage();
+        saveDataToStorage();
         renderAll();
         showToast(editingVendorId ? 'Vendor updated successfully!' : 'Vendor added successfully!', 'success');
         closeModal();
@@ -1080,7 +1140,7 @@
           recordCount--;
         }
         
-        saveVendorsToStorage();
+        saveDataToStorage();
         renderAll();
         showToast('Vendor deleted successfully!', 'success');
         closeDeleteModal();
@@ -1088,7 +1148,273 @@
         showToast('Failed to delete vendor. Please try again.', 'error');
       }
     }
+     
+    // Contract Management
+    function openAddContractModal() {
+      if (vendors.length === 0) {
+        showToast('Please add a vendor first', 'error');
+        return;
+      }
+      
+      const modal = document.getElementById('contract-modal');
+      if (!modal) {
+        createContractModal();
+      }
+      document.getElementById('contract-modal').classList.add('active');
+    }
     
+    function createContractModal() {
+      const vendorOptions = vendors.map(v => `<option value="${v.__backendId}">${escapeHtml(v.name)}</option>`).join('');
+      const html = `<div id="contract-modal" class="modal-overlay">
+        <div class="modal-content">
+          <div class="flex items-center justify-between mb-6">
+            <h2 id="contract-modal-title" class="text-2xl font-bold">Add Contract</h2>
+            <button onclick="closeContractModal()" id="close-contract-modal" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+          <form id="contract-form" class="space-y-4">
+            <div><label for="contract-vendor" class="block text-sm font-medium mb-2">Vendor *</label>
+              <select id="contract-vendor" class="input-field" required>
+                <option value="">Select a vendor</option>
+                ${vendorOptions}
+              </select>
+            </div>
+            <div><label for="contract-type" class="block text-sm font-medium mb-2">Contract Type *</label>
+              <input type="text" id="contract-type" class="input-field" placeholder="e.g., Service Agreement" required>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div><label for="contract-amount" class="block text-sm font-medium mb-2">Amount ($) *</label>
+                <input type="number" id="contract-amount" class="input-field" placeholder="0" min="0" required>
+              </div>
+              <div><label for="contract-status" class="block text-sm font-medium mb-2">Status *</label>
+                <select id="contract-status" class="input-field" required>
+                  <option value="active">Active</option>
+                  <option value="pending">Pending</option>
+                  <option value="expired">Expired</option>
+                  <option value="renewed">Renewed</option>
+                </select>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div><label for="contract-start-date" class="block text-sm font-medium mb-2">Start Date *</label>
+                <input type="date" id="contract-start-date" class="input-field" required>
+              </div>
+              <div><label for="contract-end-date" class="block text-sm font-medium mb-2">End Date *</label>
+                <input type="date" id="contract-end-date" class="input-field" required>
+              </div>
+            </div>
+            <div class="flex justify-end gap-3 pt-4">
+              <button type="button" onclick="closeContractModal()" class="btn-secondary">Cancel</button>
+              <button type="submit" class="btn-primary">Save Contract</button>
+            </div>
+          </form>
+        </div>
+      </div>`;
+      document.body.insertAdjacentHTML('beforeend', html);
+      document.getElementById('contract-form').addEventListener('submit', handleContractSubmit);
+    }
+    
+    function closeContractModal() {
+      const modal = document.getElementById('contract-modal');
+      if (modal) modal.classList.remove('active');
+    }
+    
+    function handleContractSubmit(e) {
+      e.preventDefault();
+      const contractData = {
+        type: 'contract',
+        vendor_id: document.getElementById('contract-vendor').value,
+        contract_type: document.getElementById('contract-type').value,
+        amount: parseFloat(document.getElementById('contract-amount').value),
+        status: document.getElementById('contract-status').value,
+        start_date: document.getElementById('contract-start-date').value,
+        end_date: document.getElementById('contract-end-date').value,
+        __backendId: Math.random().toString(36).substr(2, 9),
+        created_at: new Date().toISOString()
+      };
+      
+      contracts.push(contractData);
+      saveDataToStorage();
+      renderAll();
+      showToast('Contract added successfully!', 'success');
+      closeContractModal();
+    }
+    
+    // Document Management
+    function openAddDocumentModal() {
+      if (vendors.length === 0) {
+        showToast('Please add a vendor first', 'error');
+        return;
+      }
+      
+      const modal = document.getElementById('document-modal');
+      if (!modal) {
+        createDocumentModal();
+      }
+      document.getElementById('document-modal').classList.add('active');
+    }
+    
+    function createDocumentModal() {
+      const vendorOptions = vendors.map(v => `<option value="${v.__backendId}">${escapeHtml(v.name)}</option>`).join('');
+      const html = `<div id="document-modal" class="modal-overlay">
+        <div class="modal-content">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold">Add Document</h2>
+            <button onclick="closeDocumentModal()" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+          <form id="document-form" class="space-y-4">
+            <div><label for="document-vendor" class="block text-sm font-medium mb-2">Vendor *</label>
+              <select id="document-vendor" class="input-field" required>
+                <option value="">Select a vendor</option>
+                ${vendorOptions}
+              </select>
+            </div>
+            <div><label for="document-name" class="block text-sm font-medium mb-2">Document Name *</label>
+              <input type="text" id="document-name" class="input-field" placeholder="e.g., NDA, Terms & Conditions" required>
+            </div>
+            <div><label for="document-type" class="block text-sm font-medium mb-2">Document Type *</label>
+              <select id="document-type" class="input-field" required>
+                <option value="">Select type</option>
+                <option value="nda">NDA</option>
+                <option value="contract">Contract</option>
+                <option value="terms">Terms & Conditions</option>
+                <option value="sla">SLA</option>
+                <option value="insurance">Insurance</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div><label for="document-expiry" class="block text-sm font-medium mb-2">Expiry Date (Optional)</label>
+              <input type="date" id="document-expiry" class="input-field">
+            </div>
+            <div class="flex justify-end gap-3 pt-4">
+              <button type="button" onclick="closeDocumentModal()" class="btn-secondary">Cancel</button>
+              <button type="submit" class="btn-primary">Save Document</button>
+            </div>
+          </form>
+        </div>
+      </div>`;
+      document.body.insertAdjacentHTML('beforeend', html);
+      document.getElementById('document-form').addEventListener('submit', handleDocumentSubmit);
+    }
+    
+    function closeDocumentModal() {
+      const modal = document.getElementById('document-modal');
+      if (modal) modal.classList.remove('active');
+    }
+    
+    function handleDocumentSubmit(e) {
+      e.preventDefault();
+      const documentData = {
+        type: 'document',
+        vendor_id: document.getElementById('document-vendor').value,
+        document_name: document.getElementById('document-name').value,
+        document_type: document.getElementById('document-type').value,
+        expiry_date: document.getElementById('document-expiry').value,
+        __backendId: Math.random().toString(36).substr(2, 9),
+        created_at: new Date().toISOString()
+      };
+      
+      documents.push(documentData);
+      saveDataToStorage();
+      renderAll();
+      showToast('Document added successfully!', 'success');
+      closeDocumentModal();
+    }
+    
+    // Invoice Management
+    function openAddInvoiceModal() {
+      if (vendors.length === 0) {
+        showToast('Please add a vendor first', 'error');
+        return;
+      }
+      
+      const modal = document.getElementById('invoice-modal');
+      if (!modal) {
+        createInvoiceModal();
+      }
+      document.getElementById('invoice-modal').classList.add('active');
+    }
+    
+    function createInvoiceModal() {
+      const vendorOptions = vendors.map(v => `<option value="${v.__backendId}">${escapeHtml(v.name)}</option>`).join('');
+      const html = `<div id="invoice-modal" class="modal-overlay">
+        <div class="modal-content">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold">Add Invoice</h2>
+            <button onclick="closeInvoiceModal()" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+          <form id="invoice-form" class="space-y-4">
+            <div><label for="invoice-vendor" class="block text-sm font-medium mb-2">Vendor *</label>
+              <select id="invoice-vendor" class="input-field" required>
+                <option value="">Select a vendor</option>
+                ${vendorOptions}
+              </select>
+            </div>
+            <div><label for="invoice-number" class="block text-sm font-medium mb-2">Invoice Number *</label>
+              <input type="text" id="invoice-number" class="input-field" placeholder="INV-001" required>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div><label for="invoice-amount" class="block text-sm font-medium mb-2">Amount ($) *</label>
+                <input type="number" id="invoice-amount" class="input-field" placeholder="0" min="0" required>
+              </div>
+              <div><label for="invoice-status" class="block text-sm font-medium mb-2">Status *</label>
+                <select id="invoice-status" class="input-field" required>
+                  <option value="paid">Paid</option>
+                  <option value="pending">Pending</option>
+                  <option value="overdue">Overdue</option>
+                </select>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div><label for="invoice-date" class="block text-sm font-medium mb-2">Invoice Date *</label>
+                <input type="date" id="invoice-date" class="input-field" required>
+              </div>
+              <div><label for="invoice-due-date" class="block text-sm font-medium mb-2">Due Date *</label>
+                <input type="date" id="invoice-due-date" class="input-field" required>
+              </div>
+            </div>
+            <div class="flex justify-end gap-3 pt-4">
+              <button type="button" onclick="closeInvoiceModal()" class="btn-secondary">Cancel</button>
+              <button type="submit" class="btn-primary">Save Invoice</button>
+            </div>
+          </form>
+        </div>
+      </div>`;
+      document.body.insertAdjacentHTML('beforeend', html);
+      document.getElementById('invoice-form').addEventListener('submit', handleInvoiceSubmit);
+    }
+    
+    function closeInvoiceModal() {
+      const modal = document.getElementById('invoice-modal');
+      if (modal) modal.classList.remove('active');
+    }
+    
+    function handleInvoiceSubmit(e) {
+      e.preventDefault();
+      const invoiceData = {
+        type: 'invoice',
+        vendor_id: document.getElementById('invoice-vendor').value,
+        invoice_number: document.getElementById('invoice-number').value,
+        amount: parseFloat(document.getElementById('invoice-amount').value),
+        status: document.getElementById('invoice-status').value,
+        invoice_date: document.getElementById('invoice-date').value,
+        due_date: document.getElementById('invoice-due-date').value,
+        __backendId: Math.random().toString(36).substr(2, 9),
+        created_at: new Date().toISOString()
+      };
+      
+      invoices.push(invoiceData);
+      saveDataToStorage();
+      renderAll();
+      showToast('Invoice added successfully!', 'success');
+      closeInvoiceModal();
+    }
+     
     function handleSearch(e) {
       const query = e.target.value.toLowerCase();
       
