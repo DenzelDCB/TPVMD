@@ -554,7 +554,7 @@
     </div><!-- Reports View -->
     <div id="reports-view" class="view-content hidden">
      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div class="card p-6 cursor-pointer hover:shadow-xl transition-shadow">
+      <div class="card p-6 cursor-pointer hover:shadow-xl transition-shadow" onclick="openReportDownload('vendor-summary', 'Vendor Summary Report')">
        <div class="w-12 h-12 rounded-xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center mb-4">
         <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
         </svg>
@@ -562,7 +562,7 @@
        <h4 class="font-semibold mb-2">Vendor Summary Report</h4>
        <p class="text-sm opacity-60">Complete overview of all vendors</p>
       </div>
-      <div class="card p-6 cursor-pointer hover:shadow-xl transition-shadow">
+      <div class="card p-6 cursor-pointer hover:shadow-xl transition-shadow" onclick="openReportDownload('compliance', 'Compliance Report')">
        <div class="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mb-4">
         <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
         </svg>
@@ -570,7 +570,7 @@
        <h4 class="font-semibold mb-2">Compliance Report</h4>
        <p class="text-sm opacity-60">Detailed compliance status</p>
       </div>
-      <div class="card p-6 cursor-pointer hover:shadow-xl transition-shadow">
+      <div class="card p-6 cursor-pointer hover:shadow-xl transition-shadow" onclick="openReportDownload('financial', 'Financial Report')">
        <div class="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mb-4">
         <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
@@ -578,7 +578,7 @@
        <h4 class="font-semibold mb-2">Financial Report</h4>
        <p class="text-sm opacity-60">Spending analysis and forecasts</p>
       </div>
-      <div class="card p-6 cursor-pointer hover:shadow-xl transition-shadow">
+      <div class="card p-6 cursor-pointer hover:shadow-xl transition-shadow" onclick="openReportDownload('risk', 'Risk Assessment Report')">
        <div class="w-12 h-12 rounded-xl bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center mb-4">
         <svg class="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
@@ -586,7 +586,7 @@
        <h4 class="font-semibold mb-2">Risk Assessment Report</h4>
        <p class="text-sm opacity-60">Comprehensive risk analysis</p>
       </div>
-      <div class="card p-6 cursor-pointer hover:shadow-xl transition-shadow">
+      <div class="card p-6 cursor-pointer hover:shadow-xl transition-shadow" onclick="openReportDownload('performance', 'Performance Report')">
        <div class="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mb-4">
         <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
         </svg>
@@ -594,7 +594,7 @@
        <h4 class="font-semibold mb-2">Performance Report</h4>
        <p class="text-sm opacity-60">Vendor performance metrics</p>
       </div>
-      <div class="card p-6 cursor-pointer hover:shadow-xl transition-shadow">
+      <div class="card p-6 cursor-pointer hover:shadow-xl transition-shadow" onclick="openReportDownload('contracts', 'Contract Expiration Report')">
        <div class="w-12 h-12 rounded-xl bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center mb-4">
         <svg class="w-6 h-6 text-cyan-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
@@ -664,6 +664,35 @@
      <div class="flex justify-center gap-3"><button id="cancel-delete" class="btn-secondary">Cancel</button> <button id="confirm-delete" class="btn-primary bg-gradient-to-r from-rose-500 to-red-600 flex items-center gap-2"> <span id="delete-btn-text">Delete</span>
        <div id="delete-spinner" class="loading-spinner hidden"></div></button>
      </div>
+    </div>
+   </div>
+  </div><!-- Report Download Modal -->
+  <div id="report-download-modal" class="modal-overlay">
+   <div class="modal-content max-w-md theme-bg-secondary theme-text-primary">
+    <div class="flex items-center justify-between mb-6">
+     <h2 class="text-2xl font-bold" id="report-download-title">Download Report</h2>
+     <button onclick="closeReportDownloadModal()" class="text-gray-400 hover:text-gray-600">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+     </button>
+    </div>
+    <p class="text-sm opacity-60 mb-6">Select format to download:</p>
+    <div class="space-y-3">
+     <button onclick="downloadReport('csv')" class="w-full btn-primary flex items-center justify-center gap-2">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V17a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+      </svg>CSV (.csv)
+     </button>
+     <button onclick="downloadReport('excel')" class="w-full btn-secondary flex items-center justify-center gap-2">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V17a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+      </svg>Excel (.xlsx)
+     </button>
+     <button onclick="downloadReport('txt')" class="w-full btn-secondary flex items-center justify-center gap-2">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V17a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+      </svg>Text (.txt)
+     </button>
+     <button onclick="downloadReport('pdf')" class="w-full btn-secondary flex items-center justify-center gap-2">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V17a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+      </svg>PDF (.pdf)
+     </button>
     </div>
    </div>
   </div><!-- Toast Notification -->
@@ -1413,6 +1442,208 @@
       renderAll();
       showToast('Invoice added successfully!', 'success');
       closeInvoiceModal();
+    }
+    
+    // Report Management
+    let currentReportType = null;
+    
+    function openReportDownload(reportType, reportName) {
+      currentReportType = reportType;
+      document.getElementById('report-download-title').textContent = `Download ${reportName}`;
+      document.getElementById('report-download-modal').classList.add('active');
+    }
+    
+    function closeReportDownloadModal() {
+      document.getElementById('report-download-modal').classList.remove('active');
+      currentReportType = null;
+    }
+    
+    function generateReportData(type) {
+      let data = [];
+      
+      switch(type) {
+        case 'vendor-summary':
+          data = vendors.map(v => ({
+            'Vendor Name': v.name,
+            'Category': capitalize(v.category),
+            'Status': capitalize(v.status),
+            'Risk Level': capitalize(v.risk_level),
+            'Contract Value': `$${formatNumber(v.contract_value || 0)}`,
+            'Compliance Score': `${v.compliance_score || 0}%`,
+            'Contact Name': v.contact_name || 'N/A',
+            'Contact Email': v.contact_email || 'N/A'
+          }));
+          break;
+        
+        case 'compliance':
+          data = vendors.map(v => ({
+            'Vendor': v.name,
+            'Status': capitalize(v.status),
+            'Compliance Score': `${v.compliance_score || 0}%`,
+            'Last Review': formatDate(v.last_review),
+            'Category': capitalize(v.category),
+            'Risk Level': capitalize(v.risk_level)
+          }));
+          break;
+        
+        case 'financial':
+          data = vendors.map(v => ({
+            'Vendor': v.name,
+            'Contract Value': `$${formatNumber(v.contract_value || 0)}`,
+            'Contract Start': v.contract_start || 'N/A',
+            'Contract End': v.contract_end || 'N/A',
+            'Status': capitalize(v.status),
+            'Category': capitalize(v.category)
+          }));
+          break;
+        
+        case 'risk':
+          data = vendors.map(v => ({
+            'Vendor': v.name,
+            'Risk Level': capitalize(v.risk_level),
+            'Compliance Score': `${v.compliance_score || 0}%`,
+            'Category': capitalize(v.category),
+            'Status': capitalize(v.status)
+          }));
+          break;
+        
+        case 'performance':
+          data = vendors.map(v => {
+            const score = v.compliance_score || 0;
+            const performance = score >= 80 ? 'Excellent' : score >= 60 ? 'Good' : score >= 40 ? 'Fair' : 'Poor';
+            return {
+              'Vendor': v.name,
+              'Performance': performance,
+              'Score': `${score}%`,
+              'Contract Value': `$${formatNumber(v.contract_value || 0)}`,
+              'Status': capitalize(v.status)
+            };
+          });
+          break;
+        
+        case 'contracts':
+          data = contracts.length > 0 ? contracts.map(c => {
+            const vendor = vendors.find(v => v.__backendId === c.vendor_id);
+            return {
+              'Vendor': vendor ? vendor.name : 'Unknown',
+              'Contract Type': c.contract_type,
+              'Amount': `$${formatNumber(c.amount)}`,
+              'Status': capitalize(c.status),
+              'Start Date': c.start_date || 'N/A',
+              'End Date': c.end_date || 'N/A'
+            };
+          }) : [{ 'Message': 'No contracts found' }];
+          break;
+      }
+      
+      return data;
+    }
+    
+    function downloadReport(format) {
+      if (!currentReportType) return;
+      
+      const data = generateReportData(currentReportType);
+      const reportName = document.getElementById('report-download-title').textContent.replace('Download ', '').replace(' Report', '').trim();
+      
+      if (format === 'csv') {
+        downloadAsCSV(data, reportName);
+      } else if (format === 'excel') {
+        downloadAsExcel(data, reportName);
+      } else if (format === 'txt') {
+        downloadAsTXT(data, reportName);
+      } else if (format === 'pdf') {
+        downloadAsPDF(data, reportName);
+      }
+      
+      showToast(`Report downloaded as ${format.toUpperCase()}!`, 'success');
+      closeReportDownloadModal();
+    }
+    
+    function downloadAsCSV(data, filename) {
+      if (data.length === 0) {
+        showToast('No data to export', 'error');
+        return;
+      }
+      
+      const headers = Object.keys(data[0]);
+      const rows = data.map(row => headers.map(h => `"${String(row[h]).replace(/"/g, '""')}"`).join(','));
+      const csv = [headers.join(','), ...rows].join('\n');
+      
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${filename}_${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+    
+    function downloadAsExcel(data, filename) {
+      if (data.length === 0) {
+        showToast('No data to export', 'error');
+        return;
+      }
+      
+      // Simple Excel-compatible format
+      const headers = Object.keys(data[0]);
+      const rows = [headers, ...data.map(row => headers.map(h => row[h]))];
+      const csv = rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join('\t')).join('\n');
+      
+      const blob = new Blob([csv], { type: 'application/vnd.ms-excel' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${filename}_${new Date().toISOString().split('T')[0]}.xlsx`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+    
+    function downloadAsTXT(data, filename) {
+      if (data.length === 0) {
+        showToast('No data to export', 'error');
+        return;
+      }
+      
+      const headers = Object.keys(data[0]);
+      const headerLine = headers.join(' | ');
+      const separator = '='.repeat(headerLine.length);
+      
+      const rows = data.map(row => headers.map(h => String(row[h]).padEnd(20)).join(' | '));
+      const txt = [separator, headerLine, separator, ...rows].join('\n');
+      
+      const blob = new Blob([txt], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${filename}_${new Date().toISOString().split('T')[0]}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+    
+    function downloadAsPDF(data, filename) {
+      if (data.length === 0) {
+        showToast('No data to export', 'error');
+        return;
+      }
+      
+      // Create a simple PDF-like text document
+      const headers = Object.keys(data[0]);
+      const txt = [
+        `Report: ${filename}`,
+        `Generated: ${new Date().toLocaleString()}`,
+        '',
+        headers.join(' | '),
+        '='.repeat(headers.join(' | ').length),
+        ...data.map(row => headers.map(h => row[h]).join(' | '))
+      ].join('\n');
+      
+      const blob = new Blob([txt], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${filename}_${new Date().toISOString().split('T')[0]}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
     }
      
     function handleSearch(e) {
