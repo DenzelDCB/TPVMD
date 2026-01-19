@@ -370,9 +370,14 @@
      </div>
     </div><!-- Vendors View -->
     <div id="vendors-view" class="view-content hidden">
+     <div class="mb-6 flex items-center gap-4">
+      <input type="text" id="vendor-search-input" placeholder="Search vendors by name, category, status..." class="input-field flex-1 py-2" onkeyup="handleVendorSearch()">
+      <button class="btn-secondary px-4 py-2" onclick="handleVendorSearch()">Search</button>
+      <button class="btn-secondary px-4 py-2" onclick="clearVendorSearch()">Clear</button>
+     </div>
      <div class="card overflow-hidden">
       <div class="p-4 border-b theme-border flex items-center justify-between">
-       <div class="flex items-center gap-4"><select id="filter-status" class="input-field py-2 w-40"> <option value="">All Status</option> <option value="active">Active</option> <option value="pending">Pending</option> <option value="inactive">Inactive</option> <option value="review">Under Review</option> </select> <select id="filter-risk" class="input-field py-2 w-40"> <option value="">All Risk Levels</option> <option value="low">Low Risk</option> <option value="medium">Medium Risk</option> <option value="high">High Risk</option> </select> <select id="filter-category" class="input-field py-2 w-40"> <option value="">All Categories</option> <option value="technology">Technology</option> <option value="marketing">Marketing</option> <option value="operations">Operations</option> <option value="finance">Finance</option> <option value="hr">Human Resources</option> </select>
+       <div class="flex items-center gap-4"><select id="filter-status" class="input-field py-2 w-40" onchange="handleVendorSearch()"> <option value="">All Status</option> <option value="active">Active</option> <option value="pending">Pending</option> <option value="inactive">Inactive</option> <option value="review">Under Review</option> </select> <select id="filter-risk" class="input-field py-2 w-40"> <option value="">All Risk Levels</option> <option value="low">Low Risk</option> <option value="medium">Medium Risk</option> <option value="high">High Risk</option> </select> <select id="filter-category" class="input-field py-2 w-40"> <option value="">All Categories</option> <option value="technology">Technology</option> <option value="marketing">Marketing</option> <option value="operations">Operations</option> <option value="finance">Finance</option> <option value="hr">Human Resources</option> </select>
        </div><button id="export-btn" class="btn-secondary flex items-center gap-2">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
         </svg> Export </button>
@@ -2118,6 +2123,93 @@
           </div>
         `).join('');
       }
+    }
+    
+    function handleVendorSearch() {
+      const searchInput = document.getElementById('vendor-search-input');
+      const statusFilter = document.getElementById('filter-status').value;
+      const riskFilter = document.getElementById('filter-risk').value;
+      const categoryFilter = document.getElementById('filter-category').value;
+      
+      const searchQuery = searchInput ? searchInput.value.toLowerCase() : '';
+      
+      const filtered = vendors.filter(v => {
+        const matchSearch = !searchQuery || 
+          v.name.toLowerCase().includes(searchQuery) ||
+          (v.contact_name && v.contact_name.toLowerCase().includes(searchQuery)) ||
+          (v.contact_email && v.contact_email.toLowerCase().includes(searchQuery)) ||
+          (v.category && v.category.toLowerCase().includes(searchQuery));
+        
+        const matchStatus = !statusFilter || v.status === statusFilter;
+        const matchRisk = !riskFilter || v.risk_level === riskFilter;
+        const matchCategory = !categoryFilter || v.category === categoryFilter;
+        
+        return matchSearch && matchStatus && matchRisk && matchCategory;
+      });
+      
+      renderVendorsTableFiltered(filtered);
+    }
+    
+    function clearVendorSearch() {
+      const searchInput = document.getElementById('vendor-search-input');
+      if (searchInput) {
+        searchInput.value = '';
+      }
+      document.getElementById('filter-status').value = '';
+      document.getElementById('filter-risk').value = '';
+      document.getElementById('filter-category').value = '';
+      renderVendorsTable();
+    }
+    
+    function renderVendorsTableFiltered(filtered) {
+      const tbody = document.getElementById('vendors-table-body');
+      
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center opacity-60">No vendors found</td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = filtered.map(v => `
+        <tr class="table-row border-b theme-border" data-id="${v.__backendId}">
+          <td class="p-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold shrink-0">
+                ${v.name.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <p class="font-medium">${escapeHtml(v.name)}</p>
+                <p class="text-xs opacity-60">${escapeHtml(v.contact_email || 'No email')}</p>
+              </div>
+            </div>
+          </td>
+          <td class="p-4">${capitalize(v.category || 'N/A')}</td>
+          <td class="p-4"><span class="status-badge status-${v.status}">${capitalize(v.status)}</span></td>
+          <td class="p-4"><span class="status-badge risk-${v.risk_level}">${capitalize(v.risk_level)}</span></td>
+          <td class="p-4 font-medium">$${formatNumber(v.contract_value || 0)}</td>
+          <td class="p-4">
+            <div class="flex items-center gap-2">
+              <div class="progress-bar w-20">
+                <div class="progress-fill ${v.compliance_score >= 80 ? 'bg-emerald-500' : v.compliance_score >= 50 ? 'bg-amber-500' : 'bg-rose-500'}" style="width: ${v.compliance_score || 0}%"></div>
+              </div>
+              <span class="text-sm">${v.compliance_score || 0}%</span>
+            </div>
+          </td>
+          <td class="p-4">
+            <div class="flex items-center gap-2">
+              <button onclick="openEditModal(vendors.find(v => v.__backendId === '${v.__backendId}'))" class="p-2 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/30 text-indigo-600 transition-colors" title="Edit">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+              </button>
+              <button onclick="openDeleteModal(vendors.find(v => v.__backendId === '${v.__backendId}'))" class="p-2 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-900/30 text-rose-600 transition-colors" title="Delete">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
     }
     
     function renderVendorsTable(searchQuery = '') {
