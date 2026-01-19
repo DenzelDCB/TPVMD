@@ -205,7 +205,9 @@
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
       </svg><span>Vendors</span> </button> <button class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all" data-view="contracts">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-      </svg><span>Contracts</span> </button> <button class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all" data-view="compliance">
+      </svg><span>Contracts</span> </button> <button class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all" data-view="team">
+       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+       </svg><span>Team (RACI)</span> </button> <button class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all" data-view="compliance">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
       </svg><span>Compliance</span> </button> <button class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all" data-view="analytics">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -416,6 +418,41 @@
       <h3 class="font-semibold mb-6">Contract Timeline</h3>
       <div id="contracts-timeline" class="space-y-4">
        <p class="text-center py-8 opacity-60">No contracts to display</p>
+      </div>
+     </div>
+    </div><!-- Team (RACI) View -->
+    <div id="team-view" class="view-content hidden">
+     <div class="mb-8">
+      <div class="flex items-center justify-between mb-6">
+       <div>
+        <h2 class="text-2xl font-bold">Team & RACI Matrix</h2>
+        <p class="text-sm opacity-60">Manage team members and responsibility assignments</p>
+       </div>
+       <button onclick="openAddTeamMemberModal()" class="btn-primary flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg><span>Add Team Member</span>
+       </button>
+      </div>
+      <div class="card overflow-hidden">
+       <div class="overflow-x-auto">
+        <table class="w-full">
+         <thead class="text-left text-sm opacity-60 border-b theme-border">
+          <tr>
+           <th class="p-4 font-medium">Name</th>
+           <th class="p-4 font-medium">Role</th>
+           <th class="p-4 font-medium">Email</th>
+           <th class="p-4 font-medium">Department</th>
+           <th class="p-4 font-medium">RACI Level</th>
+           <th class="p-4 font-medium">Actions</th>
+          </tr>
+         </thead>
+         <tbody id="team-table-body">
+          <tr>
+           <td colspan="6" class="p-8 text-center opacity-60">No team members added yet</td>
+          </tr>
+         </tbody>
+        </table>
+       </div>
       </div>
      </div>
     </div><!-- Compliance View -->
@@ -666,6 +703,64 @@
      </div>
     </div>
    </div>
+  </div><!-- Add Team Member Modal -->
+  <div id="team-member-modal" class="modal-overlay">
+   <div class="modal-content max-w-md theme-bg-secondary theme-text-primary">
+    <div class="flex items-center justify-between mb-6">
+     <h2 class="text-2xl font-bold">Add Team Member</h2>
+     <button onclick="closeTeamMemberModal()" class="text-gray-400 hover:text-gray-600">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+     </button>
+    </div>
+    <form id="team-member-form" class="space-y-4">
+     <div>
+      <label for="member-name" class="block text-sm font-medium mb-2">Full Name *</label>
+      <input type="text" id="member-name" required class="input-field" placeholder="John Doe">
+     </div>
+     <div>
+      <label for="member-email" class="block text-sm font-medium mb-2">Email *</label>
+      <input type="email" id="member-email" required class="input-field" placeholder="john@company.com">
+     </div>
+     <div class="grid grid-cols-2 gap-4">
+      <div>
+       <label for="member-role" class="block text-sm font-medium mb-2">Role *</label>
+       <select id="member-role" required class="input-field">
+        <option value="">Select role</option>
+        <option value="Vendor Manager">Vendor Manager</option>
+        <option value="Risk Manager">Risk Manager</option>
+        <option value="Compliance Officer">Compliance Officer</option>
+        <option value="Director">Director</option>
+        <option value="Analyst">Analyst</option>
+       </select>
+      </div>
+      <div>
+       <label for="member-department" class="block text-sm font-medium mb-2">Department *</label>
+       <select id="member-department" required class="input-field">
+        <option value="">Select department</option>
+        <option value="Risk Management">Risk Management</option>
+        <option value="Compliance">Compliance</option>
+        <option value="Operations">Operations</option>
+        <option value="IT">IT</option>
+        <option value="Finance">Finance</option>
+       </select>
+      </div>
+     </div>
+     <div>
+      <label for="member-raci" class="block text-sm font-medium mb-2">RACI Level *</label>
+      <select id="member-raci" required class="input-field">
+       <option value="">Select RACI Level</option>
+       <option value="Responsible">Responsible (R)</option>
+       <option value="Accountable">Accountable (A)</option>
+       <option value="Consulted">Consulted (C)</option>
+       <option value="Informed">Informed (I)</option>
+      </select>
+     </div>
+     <div class="flex justify-end gap-3 pt-4">
+      <button type="button" onclick="closeTeamMemberModal()" class="btn-secondary">Cancel</button>
+      <button type="submit" class="btn-primary">Add Member</button>
+     </div>
+    </form>
+   </div>
   </div><!-- Report Download Modal -->
   <div id="report-download-modal" class="modal-overlay">
    <div class="modal-content max-w-md theme-bg-secondary theme-text-primary">
@@ -703,6 +798,7 @@
     let contracts = [];
     let documents = [];
     let invoices = [];
+    let teamMembers = [];
     let currentView = 'dashboard';
     let isDarkMode = false;
     let editingVendorId = null;
@@ -714,6 +810,7 @@
     const STORAGE_KEY_CONTRACTS = 'vendorhub_contracts';
     const STORAGE_KEY_DOCUMENTS = 'vendorhub_documents';
     const STORAGE_KEY_INVOICES = 'vendorhub_invoices';
+    const STORAGE_KEY_TEAM = 'vendorhub_team';
     
     // Load all data from localStorage
     function loadDataFromStorage() {
@@ -738,6 +835,11 @@
         if (storedInvoices) {
           invoices = JSON.parse(storedInvoices);
         }
+        
+        const storedTeam = localStorage.getItem(STORAGE_KEY_TEAM);
+        if (storedTeam) {
+          teamMembers = JSON.parse(storedTeam);
+        }
       } catch (e) {
         console.error('Failed to load data from localStorage:', e);
       }
@@ -750,6 +852,7 @@
         localStorage.setItem(STORAGE_KEY_CONTRACTS, JSON.stringify(contracts));
         localStorage.setItem(STORAGE_KEY_DOCUMENTS, JSON.stringify(documents));
         localStorage.setItem(STORAGE_KEY_INVOICES, JSON.stringify(invoices));
+        localStorage.setItem(STORAGE_KEY_TEAM, JSON.stringify(teamMembers));
       } catch (e) {
         console.error('Failed to save data to localStorage:', e);
       }
@@ -1444,6 +1547,73 @@
       closeInvoiceModal();
     }
     
+    // Team Management
+    function openAddTeamMemberModal() {
+      document.getElementById('team-member-modal').classList.add('active');
+      document.getElementById('team-member-form').reset();
+    }
+    
+    function closeTeamMemberModal() {
+      document.getElementById('team-member-modal').classList.remove('active');
+    }
+    
+    document.getElementById('team-member-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const teamMember = {
+        __backendId: Math.random().toString(36).substr(2, 9),
+        name: document.getElementById('member-name').value,
+        email: document.getElementById('member-email').value,
+        role: document.getElementById('member-role').value,
+        department: document.getElementById('member-department').value,
+        raci_level: document.getElementById('member-raci').value,
+        created_at: new Date().toISOString()
+      };
+      
+      teamMembers.push(teamMember);
+      saveDataToStorage();
+      renderTeamTable();
+      showToast('Team member added successfully!', 'success');
+      closeTeamMemberModal();
+    });
+    
+    function renderTeamTable() {
+      const tbody = document.getElementById('team-table-body');
+      
+      if (teamMembers.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center opacity-60">No team members added yet</td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = teamMembers.map((member, index) => `
+        <tr class="control-row">
+          <td class="p-4">${escapeHtml(member.name)}</td>
+          <td class="p-4">${escapeHtml(member.role)}</td>
+          <td class="p-4">${escapeHtml(member.email)}</td>
+          <td class="p-4">${escapeHtml(member.department)}</td>
+          <td class="p-4">
+            <span class="status-badge status-active">${escapeHtml(member.raci_level)}</span>
+          </td>
+          <td class="p-4">
+            <button onclick="deleteTeamMember('${member.__backendId}')" class="text-red-500 hover:text-red-700">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+    
+    function deleteTeamMember(id) {
+      const index = teamMembers.findIndex(m => m.__backendId === id);
+      if (index !== -1) {
+        teamMembers.splice(index, 1);
+        saveDataToStorage();
+        renderTeamTable();
+        showToast('Team member deleted', 'success');
+      }
+    }
+    
     // Report Management
     let currentReportType = null;
     
@@ -1584,17 +1754,21 @@
         return;
       }
       
-      // Simple Excel-compatible format
+      // Create proper Excel format (Tab-separated for better compatibility)
       const headers = Object.keys(data[0]);
-      const rows = [headers, ...data.map(row => headers.map(h => row[h]))];
-      const csv = rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join('\t')).join('\n');
+      const rows = [headers.join('\t'), ...data.map(row => headers.map(h => String(row[h] || '')).join('\t'))];
+      const content = rows.join('\n');
       
-      const blob = new Blob([csv], { type: 'application/vnd.ms-excel' });
+      // Use proper Excel MIME type and BOM for UTF-8
+      const BOM = '\uFEFF';
+      const blob = new Blob([BOM + content], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = `${filename}_${new Date().toISOString().split('T')[0]}.xlsx`;
+      document.body.appendChild(a);
       a.click();
+      document.body.removeChild(a);
       URL.revokeObjectURL(url);
     }
     
